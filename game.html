@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Game of war</title>
+    <style type="text/css">
+    * {
+      margin: 0; padding: 0;
+    }
+    #canvas {
+      display: block;
+      background: #c7c7e4;
+    }
+    #war-field {
+        width: 50%;
+        float: left;
+        overflow: scroll;
+    }
+    #instruction-code {
+        width: 50%;
+        float: left;
+        overflow: scroll;
+    }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script type="text/javascript" src="soldier.js"></script>
+    <script type="text/javascript" src="robot.js"></script>
+    <script type="text/javascript" src="player.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+</head>
+
+<body>
+    <div id="war-field">
+        <button id="but-start">Start</button>
+        <button id="but-stop">Stop</button>
+        <canvas id="canvas"></canvas>
+    </div>
+    <div id="instruction-code">
+        <div>Program your soldiers:</div>
+        <button id="but-apply-code">Apply your code</button>
+        <br>
+        <textarea id="code-area" rows="50" cols="100">
+/* 每一轮行动中，士兵最多可以消耗1个行动数，士兵可以有如下行动指令：
+this.moveUp()
+    向上移动一个单位，该指令消耗1个行动数。
+this.moveDown()
+    向下移动一个单位，该指令消耗1个行动数。
+this.moveLeft()
+    向左移动一个单位，该指令消耗1个行动数。
+this.moveRight()
+    向右移动一个单位，该指令消耗1个行动数。
+this.shoot(relativeX, relativeY)
+    向某个相对方向开枪射击，该指令消耗1个行动数。
+this.probePosition(relativeX, relativeY)
+    侦查某个相对位置，如果该位置有士兵，则返回该士兵对象，否则返回null。该指令消耗0个行动数。
+*/    
+var i = Math.floor(Math.random() * 5);
+switch(i) {
+    case 0:
+        this.moveUp();
+        break;
+    case 1:
+        this.moveDown();
+        break;
+    case 2:
+        this.moveLeft();
+        break;
+    case 3:
+        this.moveRight();
+        break;
+    case 4:
+        var x = Math.floor(Math.random() * MAP_WIDTH_UNIT) - Math.floor(MAP_WIDTH_UNIT/2);
+        var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT) - Math.floor(MAP_HEIGHT_UNIT/2);
+        this.shoot(x, y);
+        break;
+}
+        </textarea>
+    </div>
+</body>
+</html>
