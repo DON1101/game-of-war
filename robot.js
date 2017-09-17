@@ -5,7 +5,7 @@ var Robot = function(position, color, health) {
 Robot.prototype = Object.create(Soldier.prototype);
 
 Robot.prototype.randomAction = function() {
-    var i = Math.floor(Math.random() * 5);
+    var i = Math.floor(Math.random() * 4);
     switch(i) {
         case 0:
             this.moveUp();
