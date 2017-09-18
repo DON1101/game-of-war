@@ -1,17 +1,27 @@
+// shim layer with setTimeout fallback
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();
+
 var UNIT_SIZE = 3; // px
 var MAP_WIDTH_UNIT = 200;
 var MAP_HEIGHT_UNIT = 200;
 var SOLDIER_NUM_EACH = 500;
 var COLOR_NUM = 2;
-var SIGHT_RANGE_UNIT = 10; // how far can a soldier can see in sight
+var COLOR_LIST = ["red", "blue", "green", "black", "purple"];
+var SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
 
 var canvas = null;
 var context = null;
-var gameStop = undefined;
+var gameRunning = true;
 var distMatrix = null;
 var map = null;
 var soldierList = null;
-var dictSoldierNum = {};
 var nextSoldierId = 0;
 
 var userCodeDefault = `

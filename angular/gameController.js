@@ -1,6 +1,12 @@
-angular.module("gameApp", [])
+gameApp
 .controller("gameController", function($scope, $interval) {
+    $scope.COLOR_NUM = COLOR_NUM;
+    $scope.COLOR_LIST = COLOR_LIST;
+    $scope.SOLDIER_NUM_EACH = SOLDIER_NUM_EACH;
+
     $scope.userCode = userCodeDefault;
+    $scope.dictSoldierNum = {};
+    $scope.youWin = null;
 
     var initMap = function() {
         map = new Array(MAP_WIDTH_UNIT);
@@ -9,6 +15,7 @@ angular.module("gameApp", [])
         }
         resetMap();
         nextSoldierId = 0;
+        $scope.youWin = null;
         return map;
     }
 
@@ -20,16 +27,11 @@ angular.module("gameApp", [])
         }
     }
 
-    var initColor = function() {
-        var colorList = ["red", "blue", "green", "black", "purple"];
-        return colorList;
-    }
-
-    var initSoldierRand = function(colorList) {
+    var initSoldierRand = function() {
         var soldierList = new Array();
         for (var i = 0; i < COLOR_NUM; i++) {
-            var color = colorList[i];
-            dictSoldierNum[color] = SOLDIER_NUM_EACH;
+            var color = COLOR_LIST[i];
+            $scope.dictSoldierNum[color] = SOLDIER_NUM_EACH;
             for (var j = 0; j < SOLDIER_NUM_EACH; j++) {
                 var x = Math.floor(Math.random() * MAP_WIDTH_UNIT);
                 var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT);
@@ -112,18 +114,25 @@ angular.module("gameApp", [])
             if (victimFinal != null) {
                 victimFinal.shotBy(soldier1);
                 if (!victimFinal.alive()) {
-                    dictSoldierNum[victimFinal.color]--;
+                    $scope.dictSoldierNum[victimFinal.color]--;
                 }
             }
         }
     }
 
     var checkWinner = function() {
-        for (var color in dictSoldierNum) {
-            if (dictSoldierNum[color] <= 0) {
-                alert("Color " + color + " lose!");
-                $scope.stopGame();
+        var end = false;
+        for (var color in $scope.dictSoldierNum) {
+            if ($scope.dictSoldierNum[color] <= 0) {
+                end = true;
             }
+        }
+        if (end) {
+            $scope.youWin = $scope.dictSoldierNum[COLOR_LIST[0]]>0;
+            $scope.stopGame();
+        }
+        if(!$scope.$$phase) {
+            $scope.$apply();
         }
     }
 
@@ -149,27 +158,28 @@ angular.module("gameApp", [])
         drawMap(context, soldierList);
     }
 
+    var runGame = function() {
+        if (gameRunning) {
+            requestAnimFrame(runGame);
+            run();
+        }
+    }
+
     $scope.resetGame = function() {
         $scope.stopGame();
         initMap();
-        var colorList = initColor();
-        soldierList = initSoldierRand(colorList);
+        soldierList = initSoldierRand();
         initDistMatrix(soldierList);
         drawMap(context, soldierList);
     }
 
     $scope.startGame = function() {
-        $scope.stopGame();
-        gameStop = $interval(function() {
-            run();       
-        }, 0);
+        gameRunning = true;
+        runGame();
     }
 
     $scope.stopGame = function() {
-        if (angular.isDefined(gameStop)) {
-            $interval.cancel(gameStop);
-            gameStop = undefined;
-        }
+        gameRunning = false;
     }
 
     $scope.applyCode = function() {
