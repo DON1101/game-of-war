@@ -15,6 +15,8 @@ var SOLDIER_NUM_EACH = 500;
 var COLOR_NUM = 2;
 var COLOR_LIST = ["red", "blue", "green", "black", "purple"];
 var SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
+var SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
+var GAME_TOTAL_TIME = 10; // in seconds
 
 var canvas = null;
 var context = null;

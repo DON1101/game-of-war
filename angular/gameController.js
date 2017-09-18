@@ -3,10 +3,14 @@ gameApp
     $scope.COLOR_NUM = COLOR_NUM;
     $scope.COLOR_LIST = COLOR_LIST;
     $scope.SOLDIER_NUM_EACH = SOLDIER_NUM_EACH;
+    $scope.GAME_TOTAL_TIME = GAME_TOTAL_TIME;
 
     $scope.userCode = userCodeDefault;
     $scope.dictSoldierNum = {};
     $scope.youWin = null;
+    $scope.timeElapsed = 0;
+
+    var timerStop = null;
 
     var initMap = function() {
         map = new Array(MAP_WIDTH_UNIT);
@@ -16,6 +20,7 @@ gameApp
         resetMap();
         nextSoldierId = 0;
         $scope.youWin = null;
+        $scope.timeElapsed = 0;
         return map;
     }
 
@@ -61,7 +66,7 @@ gameApp
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (var i in soldierList) {
             var soldier = soldierList[i];
-            if (!soldier.alive()) {
+            if (!soldier.alive) {
                 continue;
             }
             ctx.fillStyle = soldier.color;
@@ -72,13 +77,13 @@ gameApp
     var updateDistMatrix = function(soldierList) {
         for (var i = 0; i < soldierList.length; i++) {
             var soldier1 = soldierList[i];
-            if (!soldier1.alive()) {
+            if (!soldier1.alive) {
                 continue;
             }
             map[soldier1.pos.x][soldier1.pos.y] = soldier1;
             for (var j = i+1; j < soldierList.length; j++) {
                 var soldier2 = soldierList[j];
-                if (!soldier2.alive()) {
+                if (!soldier2.alive) {
                     continue;
                 }
                 var dist = soldier1.distWithSoldier(soldier2);
@@ -91,7 +96,7 @@ gameApp
     var updateHealth = function(soldierList) {
         for (var i = 0; i < soldierList.length; i++) {
             var soldier1 = soldierList[i];
-            if (!soldier1.alive() || soldier1.bullet == null) {
+            if (!soldier1.alive || soldier1.bullet == null) {
                 continue;
             }
             var minDistFromVictimCandi = Number.MAX_SAFE_INTEGER;
@@ -101,19 +106,20 @@ gameApp
                     continue; // skip self
                 }
                 var soldier2 = soldierList[j];
-                if (!soldier2.alive()) {
+                if (!soldier2.alive) {
                     continue;
                 }
                 var dist = distMatrix[soldier1.id][soldier2.id];
                 if (dist < minDistFromVictimCandi &&
+                    dist <= SHOOT_RANGE_UNIT &&
                     soldier2.shootableBy(soldier1)) {
                     minDistFromVictimCandi = dist;
                     victimFinal = soldier2;
                 }
             }
             if (victimFinal != null) {
-                victimFinal.shotBy(soldier1);
-                if (!victimFinal.alive()) {
+                victimFinal.shotBy(soldier1, minDistFromVictimCandi);
+                if (victimFinal.hp <= 0) {
                     $scope.dictSoldierNum[victimFinal.color]--;
                 }
             }
@@ -127,8 +133,11 @@ gameApp
                 end = true;
             }
         }
+        if ($scope.timeElapsed >= GAME_TOTAL_TIME) {
+            end = true;
+        }
         if (end) {
-            $scope.youWin = $scope.dictSoldierNum[COLOR_LIST[0]]>0;
+            $scope.youWin = $scope.dictSoldierNum[COLOR_LIST[0]]>$scope.dictSoldierNum[COLOR_LIST[1]];
             $scope.stopGame();
         }
         if(!$scope.$$phase) {
@@ -144,8 +153,8 @@ gameApp
 
         for (var i in soldierList) {
             soldier = soldierList[i];
-            soldier.resetAction();
-            if (soldier.alive()) {
+            soldier.refresh();
+            if (soldier.alive) {
                 try {
                     soldier.nextAction();
                 } catch(e) {
@@ -176,10 +185,18 @@ gameApp
     $scope.startGame = function() {
         gameRunning = true;
         runGame();
+
+        if (timerStop != null) {
+            $interval.cancel(timerStop);
+        }
+        timerStop = $interval(function() {
+            $scope.timeElapsed++;
+        }, 1000);
     }
 
     $scope.stopGame = function() {
         gameRunning = false;
+        $interval.cancel(timerStop);
     }
 
     $scope.applyCode = function() {

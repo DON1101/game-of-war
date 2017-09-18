@@ -38,38 +38,58 @@ Robot.prototype.moveToward = function(soldier) {
 }
 
 Robot.prototype.nextAction = function() {
-    var foundEnemy = false;
-    var lastFoundFriend = null;
-    for (var i = -SIGHT_RANGE_UNIT; i <= SIGHT_RANGE_UNIT; i++) {
-        for (var j = -SIGHT_RANGE_UNIT; j <= SIGHT_RANGE_UNIT; j++) {
-            var soldier = this.probePosition(i, j);
-            if (soldier == null || soldier.id == this.id) {
-                continue;
-            }
-            if (soldier.color != this.color) {
-                foundEnemy = true;
-                if (Math.random() < 0.5) {
-                    this.moveToward(soldier);
-                } else {
-                    this.shoot(i, j);
-                }
-                break;
-            } else {
-                lastFoundFriend = soldier;
-            }
-            if (foundEnemy) {
-                break;
-            }
-        }
-        if (foundEnemy) {
+    // var foundEnemy = false;
+    // var lastFoundFriend = null;
+    // for (var i = -SIGHT_RANGE_UNIT; i <= SIGHT_RANGE_UNIT; i++) {
+    //     for (var j = -SIGHT_RANGE_UNIT; j <= SIGHT_RANGE_UNIT; j++) {
+    //         var soldier = this.probePosition(i, j);
+    //         if (soldier == null || soldier.id == this.id) {
+    //             continue;
+    //         }
+    //         if (soldier.color != this.color) {
+    //             foundEnemy = true;
+    //             if (Math.random() < 0.5) {
+    //                 this.moveToward(soldier);
+    //             } else {
+    //                 this.shoot(i, j);
+    //             }
+    //             break;
+    //         } else {
+    //             lastFoundFriend = soldier;
+    //         }
+    //         if (foundEnemy) {
+    //             break;
+    //         }
+    //     }
+    //     if (foundEnemy) {
+    //         break;
+    //     }
+    // }
+    // if (!foundEnemy) {
+    //     if (lastFoundFriend != null) {
+    //         this.moveToward(lastFoundFriend);
+    //     } else {
+    //         this.randomAction();
+    //     }
+    // }
+    var i = Math.floor(Math.random() * 5);
+    switch(i) {
+        case 0:
+            this.moveUp();
             break;
-        }
-    }
-    if (!foundEnemy) {
-        if (lastFoundFriend != null) {
-            this.moveToward(lastFoundFriend);
-        } else {
-            this.randomAction();
-        }
+        case 1:
+            this.moveDown();
+            break;
+        case 2:
+            this.moveLeft();
+            break;
+        case 3:
+            this.moveRight();
+            break;
+        case 4:
+            var x = Math.floor(Math.random() * MAP_WIDTH_UNIT) - Math.floor(MAP_WIDTH_UNIT/2);
+            var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT) - Math.floor(MAP_HEIGHT_UNIT/2);
+            this.shoot(x, y);
+            break;
     }
 };

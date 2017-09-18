@@ -8,16 +8,14 @@ var Soldier = function(position, color, health) {
     this.pos = position!=null? position : new Position();
     this.color = color!=null? color : "#000000";
     this.hp = health!=null? health : 100;
+    this.alive = true;
     this.bullet = null;
     this.actionQuota = 1;
 };
 
-Soldier.prototype.alive = function() {
-    return this.hp > 0;
-}
-
-Soldier.prototype.resetAction = function() {
+Soldier.prototype.refresh = function() {
     this.actionQuota = 1;
+    this.alive = (this.hp > 0);
 }
 
 // Probe a position relative to self, e.g (1, 1), (-1, -1)
@@ -44,7 +42,7 @@ Soldier.prototype.distWithSoldier = function(soldier) {
 }
 
 Soldier.prototype.shootableBy = function(shooter) {
-    if (shooter.hp <= 0 || shooter.bullet == null) {
+    if (!shooter.alive || shooter.bullet == null) {
         return false;
     }
     var x = this.pos.x;
@@ -61,8 +59,9 @@ Soldier.prototype.shootableBy = function(shooter) {
     return dist <= UNIT_SIZE/2.0;
 }
 
-Soldier.prototype.shotBy = function(shooter) {
-    this.hp -= 1;
+Soldier.prototype.shotBy = function(shooter, distance) {
+    var harm = 1/distance;
+    this.hp -= harm;
 }
 
 Soldier.prototype.moveUp = function() {
