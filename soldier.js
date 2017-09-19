@@ -60,7 +60,7 @@ Soldier.prototype.shootableBy = function(shooter) {
 }
 
 Soldier.prototype.shotBy = function(shooter, distance) {
-    var harm = 1/distance;
+    var harm = Math.max(1 - distance/SHOOT_RANGE_UNIT, 0);
     this.hp -= harm;
 }
 

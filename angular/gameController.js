@@ -94,6 +94,7 @@ gameApp
     }
 
     var updateHealth = function(soldierList) {
+        var deadSet = new Set(); // Everybody only dies once
         for (var i = 0; i < soldierList.length; i++) {
             var soldier1 = soldierList[i];
             if (!soldier1.alive || soldier1.bullet == null) {
@@ -119,7 +120,8 @@ gameApp
             }
             if (victimFinal != null) {
                 victimFinal.shotBy(soldier1, minDistFromVictimCandi);
-                if (victimFinal.hp <= 0) {
+                if (!deadSet.has(victimFinal.id) && victimFinal.hp <= 0) {
+                    deadSet.add(victimFinal.id);
                     $scope.dictSoldierNum[victimFinal.color]--;
                 }
             }
@@ -133,7 +135,7 @@ gameApp
                 end = true;
             }
         }
-        if ($scope.timeElapsed >= GAME_TOTAL_TIME) {
+        if (GAME_TOTAL_TIME > 0 && $scope.timeElapsed >= GAME_TOTAL_TIME) {
             end = true;
         }
         if (end) {
