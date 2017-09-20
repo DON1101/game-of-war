@@ -53,11 +53,27 @@ Robot.prototype.hasFriendNearby = function(xRelative, yRelative) {
     if (soldier != null && soldier.color == this.color) {
         return true;
     }
-    soldier = this.probePosition(xRelative-1, yRelative);
+    soldier = this.probePosition(xRelative+1, yRelative);
     if (soldier != null && soldier.color == this.color) {
         return true;
     }
-    soldier = this.probePosition(xRelative+1, yRelative);
+    soldier = this.probePosition(xRelative+1, yRelative+1);
+    if (soldier != null && soldier.color == this.color) {
+        return true;
+    }
+    soldier = this.probePosition(xRelative+1, yRelative-1);
+    if (soldier != null && soldier.color == this.color) {
+        return true;
+    }
+    soldier = this.probePosition(xRelative-1, yRelative+1);
+    if (soldier != null && soldier.color == this.color) {
+        return true;
+    }
+    soldier = this.probePosition(xRelative-1, yRelative+1);
+    if (soldier != null && soldier.color == this.color) {
+        return true;
+    }
+    soldier = this.probePosition(xRelative-1, yRelative);
     if (soldier != null && soldier.color == this.color) {
         return true;
     }

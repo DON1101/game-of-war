@@ -31,7 +31,12 @@ Soldier.prototype.probePosition = function(relativeX, relativeY) {
     x = Math.min(x, MAP_WIDTH_UNIT-1);
     y = Math.max(y, 0);
     y = Math.min(y, MAP_HEIGHT_UNIT-1);
-    return map[x][y];
+    var soldier = map[x][y];
+    if (soldier != null && soldier.alive) {
+        return soldier;
+    } else {
+        return null;
+    }
 }
 
 Soldier.prototype.distWithSoldier = function(soldier) {

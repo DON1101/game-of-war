@@ -20,8 +20,8 @@ Player.prototype.nextAction = function() {
             this.moveRight();
             break;
         case 4:
-            var x = Math.floor(Math.random() * MAP_WIDTH_UNIT) - Math.floor(MAP_WIDTH_UNIT/2);
-            var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT) - Math.floor(MAP_HEIGHT_UNIT/2);
+            var x = Math.floor(Math.random() * SIGHT_RANGE_UNIT) - Math.floor(SIGHT_RANGE_UNIT/2);
+            var y = Math.floor(Math.random() * SIGHT_RANGE_UNIT) - Math.floor(SIGHT_RANGE_UNIT/2);
             this.shoot(x, y);
             break;
     }

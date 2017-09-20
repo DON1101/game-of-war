@@ -188,6 +188,7 @@ gameApp
         gameRunning = true;
         runGame();
 
+        // Timer
         if (timerStop != null) {
             $interval.cancel(timerStop);
         }

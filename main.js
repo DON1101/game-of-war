@@ -14,7 +14,7 @@ var MAP_HEIGHT_UNIT = 200;
 var SOLDIER_NUM_EACH = 500;
 var COLOR_NUM = 2;
 var COLOR_LIST = ["red", "blue", "green", "black", "purple"];
-var SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
+var SIGHT_RANGE_UNIT = 500; // how far can a soldier can see in sight
 var SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
 var GAME_TOTAL_TIME = 60; // in seconds
 
@@ -56,9 +56,27 @@ switch(i) {
         this.moveRight();
         break;
     case 4:
-        var x = Math.floor(Math.random() * MAP_WIDTH_UNIT) - Math.floor(MAP_WIDTH_UNIT/2);
-        var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT) - Math.floor(MAP_HEIGHT_UNIT/2);
+        var x = Math.floor(Math.random() * SIGHT_RANGE_UNIT) - Math.floor(SIGHT_RANGE_UNIT/2);
+        var y = Math.floor(Math.random() * SIGHT_RANGE_UNIT) - Math.floor(SIGHT_RANGE_UNIT/2);
         this.shoot(x, y);
         break;
 }
+`;
+
+var workJs = `
+
+var MAP_WIDTH_UNIT = 200;
+var MAP_HEIGHT_UNIT = 200;
+var SIGHT_RANGE_UNIT = 500; // how far can a soldier can see in sight
+var SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
+var GAME_TOTAL_TIME = 60; // in seconds
+
+var gameRunning = true;
+var distMatrix = null;
+var map = null;
+var nextSoldierId = 0;
+
+self.onmessage = function (oEvent) {
+    var data = oEvent.data;
+};
 `;
