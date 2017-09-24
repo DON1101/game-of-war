@@ -1,5 +1,5 @@
 gameApp
-.controller("gameController", function($scope, $interval) {
+.controller("gameController", function($scope, $interval, actionWorkerService) {
     $scope.COLOR_NUM = COLOR_NUM;
     $scope.COLOR_LIST = COLOR_LIST;
     $scope.SOLDIER_NUM_EACH = SOLDIER_NUM_EACH;
@@ -36,7 +36,6 @@ gameApp
         var soldierList = new Array();
         for (var i = 0; i < COLOR_NUM; i++) {
             var color = COLOR_LIST[i];
-            $scope.dictSoldierNum[color] = SOLDIER_NUM_EACH;
             for (var j = 0; j < SOLDIER_NUM_EACH; j++) {
                 var x = Math.floor(Math.random() * MAP_WIDTH_UNIT);
                 var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT);
@@ -52,6 +51,13 @@ gameApp
             }
         }
         return soldierList;
+    }
+
+    var initSoldierNumDict = function() {
+        for (var i = 0; i < COLOR_NUM; i++) {
+            var color = COLOR_LIST[i];
+            $scope.dictSoldierNum[color] = SOLDIER_NUM_EACH;
+        }
     }
 
     var initDistMatrix = function(soldierList) {
@@ -147,32 +153,49 @@ gameApp
         }
     }
 
-    var run = function() {
-        checkWinner();
-        resetMap();
-        updateDistMatrix(soldierList);
-        updateHealth(soldierList);
+    var runRender = function() {
+        // checkWinner();
+        // resetMap();
+        // updateDistMatrix(soldierList);
+        // updateHealth(soldierList);
 
-        for (var i in soldierList) {
-            soldier = soldierList[i];
-            soldier.refresh();
-            if (soldier.alive) {
-                try {
-                    soldier.nextAction();
-                } catch(e) {
-                    alert("Error: " + e);
-                    $scope.stopGame();
-                    return;
-                }
-            }
-        }
+        // for (var i in soldierList) {
+        //     soldier = soldierList[i];
+        //     soldier.refresh();
+        //     if (soldier.alive) {
+        //         try {
+        //             soldier.nextAction();
+        //         } catch(e) {
+        //             alert("Error: " + e);
+        //             $scope.stopGame();
+        //             return;
+        //         }
+        //     }
+        // }
         drawMap(context, soldierList);
+    }
+
+    var runAction = function() {
+        // var worker = new Worker(URL.createObjectURL(new Blob(
+        //     [workJs],
+        //     {type: 'application/javascript'}
+        // )));
+        // worker.onmessage = function(event) {
+        //     soldierList = event.data;
+        //     requestAnimFrame(run);
+        // }
+        // worker.postMessage(null);
+
+        actionWorkerService.start(function(soldierListNew) {
+            soldierList = soldierListNew;
+            requestAnimFrame(runRender);
+        })
     }
 
     var runGame = function() {
         if (gameRunning) {
             requestAnimFrame(runGame);
-            run();
+            runRender();
         }
     }
 
@@ -180,13 +203,15 @@ gameApp
         $scope.stopGame();
         initMap();
         soldierList = initSoldierRand();
+        initSoldierNumDict();
         initDistMatrix(soldierList);
         drawMap(context, soldierList);
     }
 
     $scope.startGame = function() {
         gameRunning = true;
-        runGame();
+        // runGame();
+        runAction();
 
         // Timer
         if (timerStop != null) {

@@ -62,21 +62,3 @@ switch(i) {
         break;
 }
 `;
-
-var workJs = `
-
-var MAP_WIDTH_UNIT = 200;
-var MAP_HEIGHT_UNIT = 200;
-var SIGHT_RANGE_UNIT = 500; // how far can a soldier can see in sight
-var SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
-var GAME_TOTAL_TIME = 60; // in seconds
-
-var gameRunning = true;
-var distMatrix = null;
-var map = null;
-var nextSoldierId = 0;
-
-self.onmessage = function (oEvent) {
-    var data = oEvent.data;
-};
-`;
