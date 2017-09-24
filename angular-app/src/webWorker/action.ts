@@ -1,10 +1,13 @@
 onmessage = (e: MessageEvent) => {
     console.log(e.data);
-}
+    initMap();
+    soldierList = initSoldierRand();
+    initSoldierNumDict();
+    initDistMatrix(soldierList);
+    gameRunning = true;
 
-export class WebWorkerAction {
-    public static code = `
-
+    start();
+};
 
 // var UNIT_SIZE = 3; // px
 // var MAP_WIDTH_UNIT = 200;
@@ -24,17 +27,6 @@ var dictSoldierNum = {};
 var youWin = null;
 var soldierList = null;
 var nextSoldierId = 0;
-
-self.onmessage = function (oEvent) {
-    var message
-    initMap();
-    soldierList = initSoldierRand();
-    initSoldierNumDict();
-    initDistMatrix(soldierList);
-    gameRunning = true;
-
-    start();
-};
 
 var initMap = function() {
     map = new Array(MAP_WIDTH_UNIT);
@@ -185,7 +177,4 @@ var run = function() {
 
 var start = function() {
     run();
-}
-
-`;
 }

@@ -1,11 +1,11 @@
 import { Component, ViewChild, ElementRef, Inject } from '@angular/core';
 import { Constant } from './constant';
-import { WebWorkerSoldier } from './webWorker/soldier';
-import { WebWorkerRobot } from './webWorker/robot';
-import { WebWorkerPlayer } from './webWorker/player';
-import { WebWorkerAction } from './webWorker/action';
-import { Message } from './webWorker/message';
-import { MessageType } from './webWorker/message';
+// import { WebWorkerSoldier } from './webWorker/soldier';
+// import { WebWorkerRobot } from './webWorker/robot';
+// import { WebWorkerPlayer } from './webWorker/player';
+// import { WebWorkerAction } from './webWorker/action';
+// import { Message } from './webWorker/message';
+// import { MessageType } from './webWorker/message';
 
 @Component({
     selector: 'dashboard',
@@ -58,7 +58,7 @@ export class DashboardComponent {
         //      WebWorkerAction.code],
         //     {type: 'application/javascript'}
         // )));
-        this.worker = new Worker('webWorker/action.ts');
+        this.worker = new Worker('worker.js');
         this.worker.addEventListener('message', this.render);
     }
 
@@ -73,8 +73,8 @@ export class DashboardComponent {
 
     public startGame = () => {
         let param = Constant.getConstantMap();
-        let message = new Message(MessageType.START, param);
-        this.worker.postMessage(message);
+        // let message = new Message(MessageType.START, param);
+        this.worker.postMessage(null);
     }
 
     public stopGame = () => {
