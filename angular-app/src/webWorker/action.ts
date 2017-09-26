@@ -1,126 +1,127 @@
-onmessage = (e: MessageEvent) => {
-    console.log(e.data);
-    initMap();
-    soldierList = initSoldierRand();
-    initSoldierNumDict();
-    initDistMatrix(soldierList);
-    gameRunning = true;
+import { Context } from './context';
+import { Position, Soldier } from './soldier';
+import { Player } from './player';
+import { Robot } from './robot';
+import { Constant } from '../app/constant';
+import { Message, MessageType } from '../base/message';
 
-    start();
+onmessage = (e: MessageEvent) => {
+    let message = e.data;
+    switch (parseInt(message.type)) {
+        case MessageType.START:
+            start();
+            break;
+        case MessageType.STOP:
+            Context.getContext().gameRunning = false;
+            break;
+        case MessageType.RESET:
+            Context.newContext();
+            initMap();
+            initSoldierRand();
+            initSoldierNumDict();
+            initDistMatrix();
+            Context.getContext().gameRunning = true;
+            postMessageType(MessageType.RUNNING);
+            break;
+        default:
+            break;
+    }    
 };
 
-// var UNIT_SIZE = 3; // px
-// var MAP_WIDTH_UNIT = 200;
-// var MAP_HEIGHT_UNIT = 200;
-// var SOLDIER_NUM_EACH = 1000;
-// var COLOR_NUM = 2;
-// var COLOR_LIST = ["red", "blue", "green", "black", "purple"];
-// var SIGHT_RANGE_UNIT = 500; // how far can a soldier can see in sight
-// var SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
-// var GAME_TOTAL_TIME = 60; // in seconds
-var param = null;
-
-var gameRunning = true;
-var distMatrix = null;
-var map = null;
-var dictSoldierNum = {};
-var youWin = null;
-var soldierList = null;
-var nextSoldierId = 0;
-
-var initMap = function() {
-    map = new Array(MAP_WIDTH_UNIT);
-    for (var i = 0; i < MAP_WIDTH_UNIT; i++) {
-        map[i] = new Array(MAP_HEIGHT_UNIT);
+let initMap = function() {
+    Context.getContext().map = new Array(Constant.MAP_WIDTH_UNIT);
+    for (let i = 0; i < Constant.MAP_WIDTH_UNIT; i++) {
+        Context.getContext().map[i] = new Array(Constant.MAP_HEIGHT_UNIT);
     }
     resetMap();
-    youWin = null;
-    return map;
+    Context.getContext().youWin = null;
+    return Context.getContext().map;
 }
 
-var resetMap = function() {
-    for (var i = 0; i < MAP_WIDTH_UNIT; i++) {
-        for (var j = 0; j < MAP_HEIGHT_UNIT; j++) {
-            map[i][j] = null;
+let resetMap = function() {
+    for (let i = 0; i < Constant.MAP_WIDTH_UNIT; i++) {
+        for (let j = 0; j < Constant.MAP_HEIGHT_UNIT; j++) {
+            Context.getContext().map[i][j] = null;
         }
     }
 }
 
-var initSoldierRand = function() {
-    var soldierList = new Array();
-    for (var i = 0; i < COLOR_NUM; i++) {
-        var color = COLOR_LIST[i];
-        for (var j = 0; j < SOLDIER_NUM_EACH; j++) {
-            var x = Math.floor(Math.random() * MAP_WIDTH_UNIT);
-            var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT);
-            var position = new Position(x, y);
+let initSoldierRand = function() {
+    Context.getContext().soldierList = new Array();
+    for (let i = 0; i < Constant.COLOR_NUM; i++) {
+        let color = Constant.COLOR_LIST[i];
+        for (let j = 0; j < Constant.SOLDIER_NUM_EACH; j++) {
+            let x = Math.floor(Math.random() * Constant.MAP_WIDTH_UNIT);
+            let y = Math.floor(Math.random() * Constant.MAP_HEIGHT_UNIT);
+            let position = new Position(x, y);
+            let soldier = null;
             if (i == 0) {
                 // init players
-                var soldier = new Player(position, color);
+                soldier = new Player(position, color);
             } else {
                 // init robots
-                var soldier = new Robot(position, color);
+                soldier = new Robot(position, color);
             }
-            soldierList.push(soldier);
+            Context.getContext().soldierList.push(soldier);
         }
     }
-    return soldierList;
+    return Context.getContext().soldierList;
 }
 
-var initSoldierNumDict = function() {
-    for (var i = 0; i < COLOR_NUM; i++) {
-        var color = COLOR_LIST[i];
-        dictSoldierNum[color] = SOLDIER_NUM_EACH;
+let initSoldierNumDict = function() {
+    for (let i = 0; i < Constant.COLOR_NUM; i++) {
+        let color = Constant.COLOR_LIST[i];
+        Context.getContext().dictSoldierNum[color] = Constant.SOLDIER_NUM_EACH;
     }
 }
 
-var initDistMatrix = function(soldierList) {
-    distMatrix = new Array(soldierList.length);
-    for (var i = 0; i < soldierList.length; i++) {
-        distMatrix[i] = new Array(soldierList.length);
+let initDistMatrix = function() {
+    Context.getContext().distMatrix = new Array(Context.getContext().soldierList.length);
+    for (let i = 0; i < Context.getContext().soldierList.length; i++) {
+        Context.getContext().distMatrix[i] = new Array(Context.getContext().soldierList.length);
     }
-    return distMatrix;
+    return Context.getContext().distMatrix;
 }
 
-var updateDistMatrix = function(soldierList) {
-    for (var i = 0; i < soldierList.length; i++) {
-        var soldier1 = soldierList[i];
+let updateDistMatrix = function() {
+    for (let i = 0; i < Context.getContext().soldierList.length; i++) {
+        let soldier1 = Context.getContext().soldierList[i];
         if (!soldier1.alive) {
             continue;
         }
-        map[soldier1.pos.x][soldier1.pos.y] = soldier1;
-        for (var j = i+1; j < soldierList.length; j++) {
-            var soldier2 = soldierList[j];
+        Context.getContext().map[soldier1.pos.x][soldier1.pos.y] = soldier1;
+        for (let j = i+1; j < Context.getContext().soldierList.length; j++) {
+            let soldier2 = Context.getContext().soldierList[j];
             if (!soldier2.alive) {
                 continue;
             }
-            var dist = soldier1.distWithSoldier(soldier2);
-            distMatrix[soldier1.id][soldier2.id] = dist;
-            distMatrix[soldier2.id][soldier1.id] = dist;
+            let dist = soldier1.distWithSoldier(soldier2);
+            Context.getContext().distMatrix[soldier1.id][soldier2.id] = dist;
+            Context.getContext().distMatrix[soldier2.id][soldier1.id] = dist;
         }
     }
 }
 
-var updateHealth = function(soldierList) {
-    var deadSet = new Set(); // Everybody only dies once
-    for (var i = 0; i < soldierList.length; i++) {
-        var soldier1 = soldierList[i];
+let updateHealth = function() {
+    let deadSet = new Set(); // Everybody only dies once
+    for (let i = 0; i < Context.getContext().soldierList.length; i++) {
+        let soldier1 = Context.getContext().soldierList[i];
         if (!soldier1.alive || soldier1.bullet == null) {
             continue;
         }
-        var minDistFromVictimCandi = Number.MAX_SAFE_INTEGER;
-        var victimFinal = null;
-        for (var j = 0; j < soldierList.length; j++) {
+        let minDistFromVictimCandi = Number.MAX_SAFE_INTEGER;
+        let victimFinal = null;
+        for (let j = 0; j < Context.getContext().soldierList.length; j++) {
             if (j == i) {
                 continue; // skip self
             }
-            var soldier2 = soldierList[j];
+            let soldier2 = Context.getContext().soldierList[j];
             if (!soldier2.alive) {
                 continue;
             }
-            var dist = distMatrix[soldier1.id][soldier2.id];
+            let dist = Context.getContext().distMatrix[soldier1.id][soldier2.id];
             if (dist < minDistFromVictimCandi &&
-                dist <= SHOOT_RANGE_UNIT &&
+                dist <= Constant.SHOOT_RANGE_UNIT &&
                 soldier2.shootableBy(soldier1)) {
                 minDistFromVictimCandi = dist;
                 victimFinal = soldier2;
@@ -130,51 +131,64 @@ var updateHealth = function(soldierList) {
             victimFinal.shotBy(soldier1, minDistFromVictimCandi);
             if (!deadSet.has(victimFinal.id) && victimFinal.hp <= 0) {
                 deadSet.add(victimFinal.id);
-                dictSoldierNum[victimFinal.color]--;
+                Context.getContext().dictSoldierNum[victimFinal.color]--;
             }
         }
     }
 }
 
-var checkWinner = function() {
-    var end = false;
-    for (var color in dictSoldierNum) {
-        if (dictSoldierNum[color] <= 0) {
+let checkWinner = function() {
+    let end = false;
+    for (let color in Context.getContext().dictSoldierNum) {
+        if (Context.getContext().dictSoldierNum[color] <= 0) {
             end = true;
         }
     }
     if (end) {
-        youWin = dictSoldierNum[COLOR_LIST[0]]>dictSoldierNum[COLOR_LIST[1]];
-        postMessage(youWin? "You win" : "You lose");
-        gameRunning = false;
+        Context.getContext().youWin = Context.getContext().dictSoldierNum[Constant.COLOR_LIST[0]]>Context.getContext().dictSoldierNum[Constant.COLOR_LIST[1]];
+        if (Context.getContext().youWin) {
+            postMessageType(MessageType.YOU_WIN);
+        } else {
+            postMessageType(MessageType.YOU_LOSE);
+        }
+        Context.getContext().gameRunning = false;
     }
 }
 
-var run = function() {
-    if (gameRunning) {
+let run = function() {
+    if (Context.getContext().gameRunning) {
         checkWinner();
         resetMap();
-        updateDistMatrix(soldierList);
-        updateHealth(soldierList);
+        updateDistMatrix();
+        updateHealth();
 
-        for (var i in soldierList) {
-            soldier = soldierList[i];
+        for (let i in Context.getContext().soldierList) {
+            let soldier = Context.getContext().soldierList[i];
             soldier.refresh();
             if (soldier.alive) {
                 try {
                     soldier.nextAction();
                 } catch(e) {
                     console.log("Error: " + e);
-                    gameRunning = false;
+                    Context.getContext().gameRunning = false;
                     return;
                 }
             }
         }
-        postMessage(soldierList);
+        postMessageType(MessageType.RUNNING);
         setTimeout(run, 10);
     }
 }
 
-var start = function() {
+let postMessageType = function(messageType: MessageType) {
+    let param = new Map<String, any>();
+    param.set("soldierList", Context.getContext().soldierList);
+    param.set("dictSoldierNum", Context.getContext().dictSoldierNum);
+    param.set("youWin", Context.getContext().youWin);
+    let message = new Message(messageType, param);
+    postMessage.apply(null, [message]);
+}
+
+let start = function() {
     run();
 }

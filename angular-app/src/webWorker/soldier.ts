@@ -1,136 +1,138 @@
-export class WebWorkerSoldier {
-    public static code = `
+import { Context } from './context';
+import { Constant } from '../app/constant';
 
-var Position = function(x, y) {
-    this.x = x!=null? x : 0;
-    this.y = y!=null? y : 0;
+export class Position {
+    constructor(private x:number = 0, private y:number = 0) {}
 };
 
-var Soldier = function(position, color, health) {
-    this.id = nextSoldierId++;
-    this.pos = position!=null? position : new Position();
-    this.color = color!=null? color : "#000000";
-    this.hp = health!=null? health : 100;
-    this.alive = true;
-    this.bullet = null;
-    this.actionQuota = 1;
+export class Soldier {
+    protected id;
+    protected pos;
+    public color = "#000000";
+    protected hp = 100;
+    protected alive = true;
+    protected bullet = null;
+    protected actionQuota = 1;
+
+    constructor(position:Position, color:string) {
+        this.id = Context.getContext().nextSoldierId++;
+        this.pos = position;
+        this.color = color;
+    }
+
+    public refresh() {
+        this.actionQuota = 1;
+        this.alive = (this.hp > 0);
+    }
+
+    // Probe a position relative to self, e.g (1, 1), (-1, -1)
+    // Return the soldier in the probed position if any
+    public probePosition(relativeX:number, relativeY:number): Soldier {
+        if (Math.abs(relativeX) > Constant.SIGHT_RANGE_UNIT || 
+            Math.abs(relativeY) > Constant.SIGHT_RANGE_UNIT) {
+            return null;
+        }
+        let x = this.pos.x + relativeX;
+        let y = this.pos.y + relativeY;
+        x = Math.max(x, 0);
+        x = Math.min(x, Constant.MAP_WIDTH_UNIT-1);
+        y = Math.max(y, 0);
+        y = Math.min(y, Constant.MAP_HEIGHT_UNIT-1);
+        let soldier = Context.getContext().map[x][y];
+        if (soldier != null && soldier.alive) {
+            return soldier;
+        } else {
+            return null;
+        }
+    }
+
+    private distWithSoldier(soldier:Soldier) {
+        return Math.sqrt(
+            Math.pow(this.pos.x-soldier.pos.x, 2) +
+            Math.pow(this.pos.y-soldier.pos.y, 2)
+        );
+    }
+
+    private shootableBy(shooter:Soldier) {
+        if (!shooter.alive || shooter.bullet == null) {
+            return false;
+        }
+        let x = this.pos.x;
+        let y = this.pos.y;
+        let xShooter = shooter.pos.x;
+        let yShooter = shooter.pos.y;
+        let xBullet = shooter.bullet.x;
+        let yBullet = shooter.bullet.y;
+        if (xBullet == 0) {
+            return x == xShooter;
+        }
+        let kBullut = yBullet/(xBullet+0.0);
+        let dist = Math.abs(kBullut*x - y + yShooter - kBullut*xShooter) / Math.sqrt(Math.pow(kBullut, 2) + 1);
+        return dist <= Constant.UNIT_SIZE/2.0;
+    }
+
+    private shotBy(shooter:Soldier, distance:number) {
+        let harm = Math.max(1 - distance/Constant.SHOOT_RANGE_UNIT, 0);
+        this.hp -= harm;
+    }
+
+    public moveUp() {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        let y = Math.max(this.pos.y-1, 0);
+        if (Context.getContext().map[this.pos.x][y] == null) {
+            this.pos.y = y;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+
+    public moveDown() {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        let y = Math.min(this.pos.y+1, Constant.MAP_HEIGHT_UNIT-1);
+        if (Context.getContext().map[this.pos.x][y] == null) {
+            this.pos.y = y;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+
+    public moveLeft() {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        let x = Math.max(this.pos.x-1, 0);
+        if (Context.getContext().map[x][this.pos.y] == null) {
+            this.pos.x = x;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+
+    public moveRight() {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        let x = Math.min(this.pos.x+1, Constant.MAP_WIDTH_UNIT-1);
+        if (Context.getContext().map[x][this.pos.y] == null) {
+            this.pos.x = x;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+
+    public shoot(x:number, y:number) {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        this.bullet = new Position(x, y);
+        this.actionQuota--;
+    };
+
+    public nextAction() {
+        // to be implemented
+    };
 };
-
-Soldier.prototype.refresh = function() {
-    this.actionQuota = 1;
-    this.alive = (this.hp > 0);
-}
-
-// Probe a position relative to self, e.g (1, 1), (-1, -1)
-// Return the soldier in the probed position if any
-Soldier.prototype.probePosition = function(relativeX, relativeY) {
-    if (Math.abs(relativeX) > SIGHT_RANGE_UNIT || 
-        Math.abs(relativeY) > SIGHT_RANGE_UNIT) {
-        return null;
-    }
-    var x = this.pos.x + relativeX;
-    var y = this.pos.y + relativeY;
-    x = Math.max(x, 0);
-    x = Math.min(x, MAP_WIDTH_UNIT-1);
-    y = Math.max(y, 0);
-    y = Math.min(y, MAP_HEIGHT_UNIT-1);
-    var soldier = map[x][y];
-    if (soldier != null && soldier.alive) {
-        return soldier;
-    } else {
-        return null;
-    }
-}
-
-Soldier.prototype.distWithSoldier = function(soldier) {
-    return Math.sqrt(
-        Math.pow(this.pos.x-soldier.pos.x, 2) +
-        Math.pow(this.pos.y-soldier.pos.y, 2)
-    );
-}
-
-Soldier.prototype.shootableBy = function(shooter) {
-    if (!shooter.alive || shooter.bullet == null) {
-        return false;
-    }
-    var x = this.pos.x;
-    var y = this.pos.y;
-    var xShooter = shooter.pos.x;
-    var yShooter = shooter.pos.y;
-    var xBullet = shooter.bullet.x;
-    var yBullet = shooter.bullet.y;
-    if (xBullet == 0) {
-        return x == xShooter;
-    }
-    var kBullut = yBullet/(xBullet+0.0);
-    var dist = Math.abs(kBullut*x - y + yShooter - kBullut*xShooter) / Math.sqrt(Math.pow(kBullut, 2) + 1);
-    return dist <= UNIT_SIZE/2.0;
-}
-
-Soldier.prototype.shotBy = function(shooter, distance) {
-    var harm = Math.max(1 - distance/SHOOT_RANGE_UNIT, 0);
-    this.hp -= harm;
-}
-
-Soldier.prototype.moveUp = function() {
-    if (this.actionQuota < 1) {
-        return;
-    }
-    var y = Math.max(this.pos.y-1, 0);
-    if (map[this.pos.x][y] == null) {
-        this.pos.y = y;
-    }
-    this.bullet = null;
-    this.actionQuota--;
-};
-
-Soldier.prototype.moveDown = function() {
-    if (this.actionQuota < 1) {
-        return;
-    }
-    var y = Math.min(this.pos.y+1, MAP_HEIGHT_UNIT-1);
-    if (map[this.pos.x][y] == null) {
-        this.pos.y = y;
-    }
-    this.bullet = null;
-    this.actionQuota--;
-};
-
-Soldier.prototype.moveLeft = function() {
-    if (this.actionQuota < 1) {
-        return;
-    }
-    var x = Math.max(this.pos.x-1, 0);
-    if (map[x][this.pos.y] == null) {
-        this.pos.x = x;
-    }
-    this.bullet = null;
-    this.actionQuota--;
-};
-
-Soldier.prototype.moveRight = function() {
-    if (this.actionQuota < 1) {
-        return;
-    }
-    var x = Math.min(this.pos.x+1, MAP_WIDTH_UNIT-1);
-    if (map[x][this.pos.y] == null) {
-        this.pos.x = x;
-    }
-    this.bullet = null;
-    this.actionQuota--;
-};
-
-Soldier.prototype.shoot = function(x, y) {
-    if (this.actionQuota < 1) {
-        return;
-    }
-    this.bullet = new Position(x, y);
-    this.actionQuota--;
-};
-
-Soldier.prototype.nextAction = function() {
-    // to be implemented
-};
-
-`;
-}

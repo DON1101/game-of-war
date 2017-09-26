@@ -60,134 +60,593 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(1);
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var context_1 = __webpack_require__(2);
+var constant_1 = __webpack_require__(1);
+var Position = (function () {
+    function Position(x, y) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        this.x = x;
+        this.y = y;
+    }
+    return Position;
+}());
+exports.Position = Position;
+;
+var Soldier = (function () {
+    function Soldier(position, color) {
+        this.color = "#000000";
+        this.hp = 100;
+        this.alive = true;
+        this.bullet = null;
+        this.actionQuota = 1;
+        this.id = context_1.Context.getContext().nextSoldierId++;
+        this.pos = position;
+        this.color = color;
+    }
+    Soldier.prototype.refresh = function () {
+        this.actionQuota = 1;
+        this.alive = (this.hp > 0);
+    };
+    // Probe a position relative to self, e.g (1, 1), (-1, -1)
+    // Return the soldier in the probed position if any
+    Soldier.prototype.probePosition = function (relativeX, relativeY) {
+        if (Math.abs(relativeX) > constant_1.Constant.SIGHT_RANGE_UNIT ||
+            Math.abs(relativeY) > constant_1.Constant.SIGHT_RANGE_UNIT) {
+            return null;
+        }
+        var x = this.pos.x + relativeX;
+        var y = this.pos.y + relativeY;
+        x = Math.max(x, 0);
+        x = Math.min(x, constant_1.Constant.MAP_WIDTH_UNIT - 1);
+        y = Math.max(y, 0);
+        y = Math.min(y, constant_1.Constant.MAP_HEIGHT_UNIT - 1);
+        var soldier = context_1.Context.getContext().map[x][y];
+        if (soldier != null && soldier.alive) {
+            return soldier;
+        }
+        else {
+            return null;
+        }
+    };
+    Soldier.prototype.distWithSoldier = function (soldier) {
+        return Math.sqrt(Math.pow(this.pos.x - soldier.pos.x, 2) +
+            Math.pow(this.pos.y - soldier.pos.y, 2));
+    };
+    Soldier.prototype.shootableBy = function (shooter) {
+        if (!shooter.alive || shooter.bullet == null) {
+            return false;
+        }
+        var x = this.pos.x;
+        var y = this.pos.y;
+        var xShooter = shooter.pos.x;
+        var yShooter = shooter.pos.y;
+        var xBullet = shooter.bullet.x;
+        var yBullet = shooter.bullet.y;
+        if (xBullet == 0) {
+            return x == xShooter;
+        }
+        var kBullut = yBullet / (xBullet + 0.0);
+        var dist = Math.abs(kBullut * x - y + yShooter - kBullut * xShooter) / Math.sqrt(Math.pow(kBullut, 2) + 1);
+        return dist <= constant_1.Constant.UNIT_SIZE / 2.0;
+    };
+    Soldier.prototype.shotBy = function (shooter, distance) {
+        var harm = Math.max(1 - distance / constant_1.Constant.SHOOT_RANGE_UNIT, 0);
+        this.hp -= harm;
+    };
+    Soldier.prototype.moveUp = function () {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        var y = Math.max(this.pos.y - 1, 0);
+        if (context_1.Context.getContext().map[this.pos.x][y] == null) {
+            this.pos.y = y;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+    ;
+    Soldier.prototype.moveDown = function () {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        var y = Math.min(this.pos.y + 1, constant_1.Constant.MAP_HEIGHT_UNIT - 1);
+        if (context_1.Context.getContext().map[this.pos.x][y] == null) {
+            this.pos.y = y;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+    ;
+    Soldier.prototype.moveLeft = function () {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        var x = Math.max(this.pos.x - 1, 0);
+        if (context_1.Context.getContext().map[x][this.pos.y] == null) {
+            this.pos.x = x;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+    ;
+    Soldier.prototype.moveRight = function () {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        var x = Math.min(this.pos.x + 1, constant_1.Constant.MAP_WIDTH_UNIT - 1);
+        if (context_1.Context.getContext().map[x][this.pos.y] == null) {
+            this.pos.x = x;
+        }
+        this.bullet = null;
+        this.actionQuota--;
+    };
+    ;
+    Soldier.prototype.shoot = function (x, y) {
+        if (this.actionQuota < 1) {
+            return;
+        }
+        this.bullet = new Position(x, y);
+        this.actionQuota--;
+    };
+    ;
+    Soldier.prototype.nextAction = function () {
+        // to be implemented
+    };
+    ;
+    return Soldier;
+}());
+exports.Soldier = Soldier;
+;
 
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Constant = (function () {
+    function Constant() {
+    }
+    return Constant;
+}());
+Constant.UNIT_SIZE = 3; // px
+Constant.MAP_WIDTH_UNIT = 200;
+Constant.MAP_HEIGHT_UNIT = 200;
+Constant.SOLDIER_NUM_EACH = 500;
+Constant.COLOR_NUM = 2;
+Constant.COLOR_LIST = ["red", "blue", "green", "black", "purple"];
+Constant.SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
+Constant.SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
+Constant.GAME_TOTAL_TIME = 60; // in seconds
+exports.Constant = Constant;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Context = (function () {
+    function Context(gameRunning, distMatrix, map, dictSoldierNum, youWin, soldierList, nextSoldierId) {
+        if (gameRunning === void 0) { gameRunning = true; }
+        if (distMatrix === void 0) { distMatrix = null; }
+        if (map === void 0) { map = null; }
+        if (dictSoldierNum === void 0) { dictSoldierNum = {}; }
+        if (youWin === void 0) { youWin = null; }
+        if (soldierList === void 0) { soldierList = null; }
+        if (nextSoldierId === void 0) { nextSoldierId = 0; }
+        this.gameRunning = gameRunning;
+        this.distMatrix = distMatrix;
+        this.map = map;
+        this.dictSoldierNum = dictSoldierNum;
+        this.youWin = youWin;
+        this.soldierList = soldierList;
+        this.nextSoldierId = nextSoldierId;
+    }
+    Context.newContext = function () {
+        Context.singleton = new Context();
+        return Context.singleton;
+    };
+    Context.getContext = function () {
+        return Context.singleton;
+    };
+    return Context;
+}());
+Context.singleton = null;
+exports.Context = Context;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var constant_1 = __webpack_require__(1);
+var soldier_1 = __webpack_require__(0);
+var Robot = (function (_super) {
+    __extends(Robot, _super);
+    function Robot(position, color) {
+        return _super.call(this, position, color) || this;
+    }
+    Robot.prototype.randomAction = function () {
+        var i = Math.floor(Math.random() * 4);
+        switch (i) {
+            case 0:
+                this.moveUp();
+                break;
+            case 1:
+                this.moveDown();
+                break;
+            case 2:
+                this.moveLeft();
+                break;
+            case 3:
+                this.moveRight();
+                break;
+            case 4:
+                var x = Math.floor(Math.random() * constant_1.Constant.MAP_WIDTH_UNIT) - Math.floor(constant_1.Constant.MAP_WIDTH_UNIT / 2);
+                var y = Math.floor(Math.random() * constant_1.Constant.MAP_HEIGHT_UNIT) - Math.floor(constant_1.Constant.MAP_HEIGHT_UNIT / 2);
+                this.shoot(x, y);
+                break;
+        }
+    };
+    Robot.prototype.moveToward = function (soldier) {
+        var xDelta = soldier.pos.x - this.pos.x;
+        var yDelta = soldier.pos.y - this.pos.y;
+        if (Math.abs(xDelta) > Math.abs(yDelta)) {
+            xDelta > 0 ? this.moveRight() : this.moveLeft();
+        }
+        else {
+            yDelta > 0 ? this.moveDown() : this.moveUp();
+        }
+    };
+    Robot.prototype.shootToward = function (soldier) {
+        var xDelta = soldier.pos.x - this.pos.x;
+        var yDelta = soldier.pos.y - this.pos.y;
+        this.shoot(xDelta, yDelta);
+    };
+    Robot.prototype.hasFriendNearby = function (xRelative, yRelative) {
+        var soldier = null;
+        soldier = this.probePosition(xRelative, yRelative - 1);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative, yRelative + 1);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative + 1, yRelative);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative + 1, yRelative + 1);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative + 1, yRelative - 1);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative - 1, yRelative + 1);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative - 1, yRelative + 1);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        soldier = this.probePosition(xRelative - 1, yRelative);
+        if (soldier != null && soldier.color == this.color) {
+            return true;
+        }
+        return false;
+    };
+    Robot.prototype.shootNearestEnemy = function () {
+        var nearestFriend = null;
+        var nearestEnemy = null;
+        for (var dist = 1; dist < constant_1.Constant.SIGHT_RANGE_UNIT; dist++) {
+            for (var i = -dist; i <= dist; i++) {
+                var soldier = this.probePosition(dist, i);
+                if (soldier != null) {
+                    if (soldier.color == this.color) {
+                        if (nearestFriend == null) {
+                            nearestFriend = soldier;
+                        }
+                    }
+                    else {
+                        if (nearestEnemy == null && !this.hasFriendNearby(dist, i)) {
+                            nearestEnemy = soldier;
+                            break;
+                        }
+                    }
+                }
+                soldier = this.probePosition(-dist, i);
+                if (soldier != null) {
+                    if (soldier.color == this.color) {
+                        if (nearestFriend == null) {
+                            nearestFriend = soldier;
+                        }
+                    }
+                    else {
+                        if (nearestEnemy == null && !this.hasFriendNearby(-dist, i)) {
+                            nearestEnemy = soldier;
+                            break;
+                        }
+                    }
+                }
+                soldier = this.probePosition(i, dist);
+                if (soldier != null) {
+                    if (soldier.color == this.color) {
+                        if (nearestFriend == null) {
+                            nearestFriend = soldier;
+                        }
+                    }
+                    else {
+                        if (nearestEnemy == null && !this.hasFriendNearby(i, dist)) {
+                            nearestEnemy = soldier;
+                            break;
+                        }
+                    }
+                }
+                soldier = this.probePosition(i, -dist);
+                if (soldier != null) {
+                    if (soldier.color == this.color) {
+                        if (nearestFriend == null) {
+                            nearestFriend = soldier;
+                        }
+                    }
+                    else {
+                        if (nearestEnemy == null && !this.hasFriendNearby(i, -dist)) {
+                            nearestEnemy = soldier;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (nearestEnemy != null) {
+                break;
+            }
+        }
+        if (nearestEnemy != null) {
+            if (Math.random() < 0.5) {
+                this.moveToward(nearestEnemy);
+            }
+            else {
+                this.shootToward(nearestEnemy);
+            }
+            return;
+        }
+        if (nearestFriend != null) {
+            this.moveToward(nearestFriend);
+            return;
+        }
+        this.randomAction();
+    };
+    Robot.prototype.nextAction = function () {
+        this.shootNearestEnemy();
+    };
+    ;
+    return Robot;
+}(soldier_1.Soldier));
+exports.Robot = Robot;
+;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var constant_1 = __webpack_require__(1);
+var soldier_1 = __webpack_require__(0);
+var Player = (function (_super) {
+    __extends(Player, _super);
+    function Player(position, color) {
+        return _super.call(this, position, color) || this;
+    }
+    Player.prototype.nextAction = function () {
+        var i = Math.floor(Math.random() * 5);
+        switch (i) {
+            case 0:
+                this.moveUp();
+                break;
+            case 1:
+                this.moveDown();
+                break;
+            case 2:
+                this.moveLeft();
+                break;
+            case 3:
+                this.moveRight();
+                break;
+            case 4:
+                var x = Math.floor(Math.random() * constant_1.Constant.SIGHT_RANGE_UNIT) - Math.floor(constant_1.Constant.SIGHT_RANGE_UNIT / 2);
+                var y = Math.floor(Math.random() * constant_1.Constant.SIGHT_RANGE_UNIT) - Math.floor(constant_1.Constant.SIGHT_RANGE_UNIT / 2);
+                this.shoot(x, y);
+                break;
+        }
+    };
+    ;
+    return Player;
+}(soldier_1.Soldier));
+exports.Player = Player;
+;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(2);
+__webpack_require__(0);
+__webpack_require__(3);
+__webpack_require__(4);
+module.exports = __webpack_require__(6);
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var context_1 = __webpack_require__(2);
+var soldier_1 = __webpack_require__(0);
+var player_1 = __webpack_require__(4);
+var robot_1 = __webpack_require__(3);
+var constant_1 = __webpack_require__(1);
+var message_1 = __webpack_require__(7);
 onmessage = function (e) {
-    console.log(e.data);
-    initMap();
-    soldierList = initSoldierRand();
-    initSoldierNumDict();
-    initDistMatrix(soldierList);
-    gameRunning = true;
-    start();
+    var message = e.data;
+    switch (parseInt(message.type)) {
+        case message_1.MessageType.START:
+            start();
+            break;
+        case message_1.MessageType.STOP:
+            context_1.Context.getContext().gameRunning = false;
+            break;
+        case message_1.MessageType.RESET:
+            context_1.Context.newContext();
+            initMap();
+            initSoldierRand();
+            initSoldierNumDict();
+            initDistMatrix();
+            context_1.Context.getContext().gameRunning = true;
+            postMessageType(message_1.MessageType.RUNNING);
+            break;
+        default:
+            break;
+    }
 };
-// var UNIT_SIZE = 3; // px
-// var MAP_WIDTH_UNIT = 200;
-// var MAP_HEIGHT_UNIT = 200;
-// var SOLDIER_NUM_EACH = 1000;
-// var COLOR_NUM = 2;
-// var COLOR_LIST = ["red", "blue", "green", "black", "purple"];
-// var SIGHT_RANGE_UNIT = 500; // how far can a soldier can see in sight
-// var SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
-// var GAME_TOTAL_TIME = 60; // in seconds
-var param = null;
-var gameRunning = true;
-var distMatrix = null;
-var map = null;
-var dictSoldierNum = {};
-var youWin = null;
-var soldierList = null;
-var nextSoldierId = 0;
 var initMap = function () {
-    map = new Array(MAP_WIDTH_UNIT);
-    for (var i = 0; i < MAP_WIDTH_UNIT; i++) {
-        map[i] = new Array(MAP_HEIGHT_UNIT);
+    context_1.Context.getContext().map = new Array(constant_1.Constant.MAP_WIDTH_UNIT);
+    for (var i = 0; i < constant_1.Constant.MAP_WIDTH_UNIT; i++) {
+        context_1.Context.getContext().map[i] = new Array(constant_1.Constant.MAP_HEIGHT_UNIT);
     }
     resetMap();
-    youWin = null;
-    return map;
+    context_1.Context.getContext().youWin = null;
+    return context_1.Context.getContext().map;
 };
 var resetMap = function () {
-    for (var i = 0; i < MAP_WIDTH_UNIT; i++) {
-        for (var j = 0; j < MAP_HEIGHT_UNIT; j++) {
-            map[i][j] = null;
+    for (var i = 0; i < constant_1.Constant.MAP_WIDTH_UNIT; i++) {
+        for (var j = 0; j < constant_1.Constant.MAP_HEIGHT_UNIT; j++) {
+            context_1.Context.getContext().map[i][j] = null;
         }
     }
 };
 var initSoldierRand = function () {
-    var soldierList = new Array();
-    for (var i = 0; i < COLOR_NUM; i++) {
-        var color = COLOR_LIST[i];
-        for (var j = 0; j < SOLDIER_NUM_EACH; j++) {
-            var x = Math.floor(Math.random() * MAP_WIDTH_UNIT);
-            var y = Math.floor(Math.random() * MAP_HEIGHT_UNIT);
-            var position = new Position(x, y);
+    context_1.Context.getContext().soldierList = new Array();
+    for (var i = 0; i < constant_1.Constant.COLOR_NUM; i++) {
+        var color = constant_1.Constant.COLOR_LIST[i];
+        for (var j = 0; j < constant_1.Constant.SOLDIER_NUM_EACH; j++) {
+            var x = Math.floor(Math.random() * constant_1.Constant.MAP_WIDTH_UNIT);
+            var y = Math.floor(Math.random() * constant_1.Constant.MAP_HEIGHT_UNIT);
+            var position = new soldier_1.Position(x, y);
+            var soldier = null;
             if (i == 0) {
                 // init players
-                var soldier = new Player(position, color);
+                soldier = new player_1.Player(position, color);
             }
             else {
                 // init robots
-                var soldier = new Robot(position, color);
+                soldier = new robot_1.Robot(position, color);
             }
-            soldierList.push(soldier);
+            context_1.Context.getContext().soldierList.push(soldier);
         }
     }
-    return soldierList;
+    return context_1.Context.getContext().soldierList;
 };
 var initSoldierNumDict = function () {
-    for (var i = 0; i < COLOR_NUM; i++) {
-        var color = COLOR_LIST[i];
-        dictSoldierNum[color] = SOLDIER_NUM_EACH;
+    for (var i = 0; i < constant_1.Constant.COLOR_NUM; i++) {
+        var color = constant_1.Constant.COLOR_LIST[i];
+        context_1.Context.getContext().dictSoldierNum[color] = constant_1.Constant.SOLDIER_NUM_EACH;
     }
 };
-var initDistMatrix = function (soldierList) {
-    distMatrix = new Array(soldierList.length);
-    for (var i = 0; i < soldierList.length; i++) {
-        distMatrix[i] = new Array(soldierList.length);
+var initDistMatrix = function () {
+    context_1.Context.getContext().distMatrix = new Array(context_1.Context.getContext().soldierList.length);
+    for (var i = 0; i < context_1.Context.getContext().soldierList.length; i++) {
+        context_1.Context.getContext().distMatrix[i] = new Array(context_1.Context.getContext().soldierList.length);
     }
-    return distMatrix;
+    return context_1.Context.getContext().distMatrix;
 };
-var updateDistMatrix = function (soldierList) {
-    for (var i = 0; i < soldierList.length; i++) {
-        var soldier1 = soldierList[i];
+var updateDistMatrix = function () {
+    for (var i = 0; i < context_1.Context.getContext().soldierList.length; i++) {
+        var soldier1 = context_1.Context.getContext().soldierList[i];
         if (!soldier1.alive) {
             continue;
         }
-        map[soldier1.pos.x][soldier1.pos.y] = soldier1;
-        for (var j = i + 1; j < soldierList.length; j++) {
-            var soldier2 = soldierList[j];
+        context_1.Context.getContext().map[soldier1.pos.x][soldier1.pos.y] = soldier1;
+        for (var j = i + 1; j < context_1.Context.getContext().soldierList.length; j++) {
+            var soldier2 = context_1.Context.getContext().soldierList[j];
             if (!soldier2.alive) {
                 continue;
             }
             var dist = soldier1.distWithSoldier(soldier2);
-            distMatrix[soldier1.id][soldier2.id] = dist;
-            distMatrix[soldier2.id][soldier1.id] = dist;
+            context_1.Context.getContext().distMatrix[soldier1.id][soldier2.id] = dist;
+            context_1.Context.getContext().distMatrix[soldier2.id][soldier1.id] = dist;
         }
     }
 };
-var updateHealth = function (soldierList) {
+var updateHealth = function () {
     var deadSet = new Set(); // Everybody only dies once
-    for (var i = 0; i < soldierList.length; i++) {
-        var soldier1 = soldierList[i];
+    for (var i = 0; i < context_1.Context.getContext().soldierList.length; i++) {
+        var soldier1 = context_1.Context.getContext().soldierList[i];
         if (!soldier1.alive || soldier1.bullet == null) {
             continue;
         }
         var minDistFromVictimCandi = Number.MAX_SAFE_INTEGER;
         var victimFinal = null;
-        for (var j = 0; j < soldierList.length; j++) {
+        for (var j = 0; j < context_1.Context.getContext().soldierList.length; j++) {
             if (j == i) {
                 continue; // skip self
             }
-            var soldier2 = soldierList[j];
+            var soldier2 = context_1.Context.getContext().soldierList[j];
             if (!soldier2.alive) {
                 continue;
             }
-            var dist = distMatrix[soldier1.id][soldier2.id];
+            var dist = context_1.Context.getContext().distMatrix[soldier1.id][soldier2.id];
             if (dist < minDistFromVictimCandi &&
-                dist <= SHOOT_RANGE_UNIT &&
+                dist <= constant_1.Constant.SHOOT_RANGE_UNIT &&
                 soldier2.shootableBy(soldier1)) {
                 minDistFromVictimCandi = dist;
                 victimFinal = soldier2;
@@ -197,32 +656,37 @@ var updateHealth = function (soldierList) {
             victimFinal.shotBy(soldier1, minDistFromVictimCandi);
             if (!deadSet.has(victimFinal.id) && victimFinal.hp <= 0) {
                 deadSet.add(victimFinal.id);
-                dictSoldierNum[victimFinal.color]--;
+                context_1.Context.getContext().dictSoldierNum[victimFinal.color]--;
             }
         }
     }
 };
 var checkWinner = function () {
     var end = false;
-    for (var color in dictSoldierNum) {
-        if (dictSoldierNum[color] <= 0) {
+    for (var color in context_1.Context.getContext().dictSoldierNum) {
+        if (context_1.Context.getContext().dictSoldierNum[color] <= 0) {
             end = true;
         }
     }
     if (end) {
-        youWin = dictSoldierNum[COLOR_LIST[0]] > dictSoldierNum[COLOR_LIST[1]];
-        postMessage(youWin ? "You win" : "You lose");
-        gameRunning = false;
+        context_1.Context.getContext().youWin = context_1.Context.getContext().dictSoldierNum[constant_1.Constant.COLOR_LIST[0]] > context_1.Context.getContext().dictSoldierNum[constant_1.Constant.COLOR_LIST[1]];
+        if (context_1.Context.getContext().youWin) {
+            postMessageType(message_1.MessageType.YOU_WIN);
+        }
+        else {
+            postMessageType(message_1.MessageType.YOU_LOSE);
+        }
+        context_1.Context.getContext().gameRunning = false;
     }
 };
 var run = function () {
-    if (gameRunning) {
+    if (context_1.Context.getContext().gameRunning) {
         checkWinner();
         resetMap();
-        updateDistMatrix(soldierList);
-        updateHealth(soldierList);
-        for (var i in soldierList) {
-            soldier = soldierList[i];
+        updateDistMatrix();
+        updateHealth();
+        for (var i in context_1.Context.getContext().soldierList) {
+            var soldier = context_1.Context.getContext().soldierList[i];
             soldier.refresh();
             if (soldier.alive) {
                 try {
@@ -230,18 +694,52 @@ var run = function () {
                 }
                 catch (e) {
                     console.log("Error: " + e);
-                    gameRunning = false;
+                    context_1.Context.getContext().gameRunning = false;
                     return;
                 }
             }
         }
-        postMessage(soldierList);
+        postMessageType(message_1.MessageType.RUNNING);
         setTimeout(run, 10);
     }
+};
+var postMessageType = function (messageType) {
+    var param = new Map();
+    param.set("soldierList", context_1.Context.getContext().soldierList);
+    param.set("dictSoldierNum", context_1.Context.getContext().dictSoldierNum);
+    param.set("youWin", context_1.Context.getContext().youWin);
+    var message = new message_1.Message(messageType, param);
+    postMessage.apply(null, [message]);
 };
 var start = function () {
     run();
 };
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var MessageType;
+(function (MessageType) {
+    MessageType[MessageType["START"] = 0] = "START";
+    MessageType[MessageType["STOP"] = 1] = "STOP";
+    MessageType[MessageType["RESET"] = 2] = "RESET";
+    MessageType[MessageType["RUNNING"] = 3] = "RUNNING";
+    MessageType[MessageType["YOU_WIN"] = 4] = "YOU_WIN";
+    MessageType[MessageType["YOU_LOSE"] = 5] = "YOU_LOSE";
+})(MessageType = exports.MessageType || (exports.MessageType = {}));
+var Message = (function () {
+    function Message(type, param) {
+        this.type = type;
+        this.param = param;
+    }
+    return Message;
+}());
+exports.Message = Message;
 
 
 /***/ })

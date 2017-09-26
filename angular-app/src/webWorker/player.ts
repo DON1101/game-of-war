@@ -1,34 +1,31 @@
-export class WebWorkerPlayer {
-    public static code = `
+import { Constant } from '../app/constant';
+import { Position, Soldier } from './soldier';
 
-var Player = function(position, color, health) {
-    Soldier.call(this, position, color, health);
-};
-
-Player.prototype = Object.create(Soldier.prototype);
-
-Player.prototype.nextAction = function() {
-    var i = Math.floor(Math.random() * 5);
-    switch(i) {
-        case 0:
-            this.moveUp();
-            break;
-        case 1:
-            this.moveDown();
-            break;
-        case 2:
-            this.moveLeft();
-            break;
-        case 3:
-            this.moveRight();
-            break;
-        case 4:
-            var x = Math.floor(Math.random() * SIGHT_RANGE_UNIT) - Math.floor(SIGHT_RANGE_UNIT/2);
-            var y = Math.floor(Math.random() * SIGHT_RANGE_UNIT) - Math.floor(SIGHT_RANGE_UNIT/2);
-            this.shoot(x, y);
-            break;
+export class Player extends Soldier {
+    constructor(position:Position, color:string) {
+        super(position, color);
     }
-};
 
-`;
-}
+    public nextAction() {
+        let i = Math.floor(Math.random() * 5);
+        switch(i) {
+            case 0:
+                this.moveUp();
+                break;
+            case 1:
+                this.moveDown();
+                break;
+            case 2:
+                this.moveLeft();
+                break;
+            case 3:
+                this.moveRight();
+                break;
+            case 4:
+                let x = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);
+                let y = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);
+                this.shoot(x, y);
+                break;
+        }
+    };
+};
