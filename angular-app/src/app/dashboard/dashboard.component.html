@@ -1,5 +1,5 @@
 <div id="dashboard">
-    <dashboard-player [playerCode]="playerCode"></dashboard-player>
+    <dashboard-player [playerCode]="playerCode" (onCodeApplied)="onCodeApplied($event)"></dashboard-player>
 
     <div *ngIf="gameRunning" class="alert alert-info font-bold" role="alert">
         战斗中...

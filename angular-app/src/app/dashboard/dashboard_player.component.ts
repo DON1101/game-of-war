@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'dashboard-player',
@@ -7,4 +7,9 @@ import { Component, Input } from '@angular/core';
 export class DashboardPlayerComponent {
     @Input() playerCodeEditting: boolean = false;
     @Input() playerCode: string;
+    @Output() onCodeApplied = new EventEmitter<string>();
+
+    public applyCode() {
+        this.onCodeApplied.emit(this.playerCode);
+    }
 }

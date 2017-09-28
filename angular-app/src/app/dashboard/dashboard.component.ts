@@ -46,13 +46,24 @@ export class DashboardComponent {
                 continue;
             }
             this.context.fillStyle = soldier.color;
-            this.context.globalAlpha = soldier.hp / 100.0;
+            // this.context.globalAlpha = soldier.hp / 100.0;
             this.context.fillRect(
                 soldier.pos.x*Constant.UNIT_SIZE, 
                 soldier.pos.y*Constant.UNIT_SIZE, 
                 Constant.UNIT_SIZE, 
                 Constant.UNIT_SIZE);
-            this.context.globalAlpha = 1.0;
+            // this.context.globalAlpha = 1.0;
+            if (soldier.shooter != null) {
+                this.context.beginPath();
+                this.context.strokeStyle = soldier.shooter.color;
+                this.context.moveTo(
+                    soldier.shooter.pos.x*Constant.UNIT_SIZE+Constant.UNIT_SIZE/2,
+                    soldier.shooter.pos.y*Constant.UNIT_SIZE+Constant.UNIT_SIZE/2);
+                this.context.lineTo(
+                    soldier.pos.x*Constant.UNIT_SIZE+Constant.UNIT_SIZE/2,
+                    soldier.pos.y*Constant.UNIT_SIZE+Constant.UNIT_SIZE/2);
+                this.context.stroke();
+            }
         }
     }
 
@@ -127,6 +138,11 @@ export class DashboardComponent {
         let message = new Message(MessageType.ASK_RESET, param);
         this.worker.postMessage(message);
         this.resetTimer();
+    }
+
+    public onCodeApplied(playerCode: string) {
+        this.playerCode = playerCode;
+        this.resetGame();
     }
 
     ngOnInit() {

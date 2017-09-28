@@ -90,13 +90,19 @@ var Soldier = (function () {
         this.alive = true;
         this.bullet = null;
         this.actionQuota = 1;
+        this.shooter = null;
         this.id = context_1.Context.getContext().nextSoldierId++;
         this.pos = position;
         this.color = color;
     }
     Soldier.prototype.refresh = function () {
+        this.bullet = null;
+        this.shooter = null;
         this.actionQuota = 1;
         this.alive = (this.hp > 0);
+    };
+    Soldier.prototype.getHp = function () {
+        return this.hp;
     };
     // Probe a position relative to self, e.g (1, 1), (-1, -1)
     // Return the soldier in the probed position if any
@@ -143,6 +149,7 @@ var Soldier = (function () {
     Soldier.prototype.shotBy = function (shooter, distance) {
         var harm = Math.max(1 - distance / constant_1.Constant.SHOOT_RANGE_UNIT, 0);
         this.hp -= harm;
+        this.shooter = shooter;
     };
     Soldier.prototype.moveUp = function () {
         if (this.actionQuota < 1) {
@@ -152,7 +159,6 @@ var Soldier = (function () {
         if (context_1.Context.getContext().map[this.pos.x][y] == null) {
             this.pos.y = y;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
     ;
@@ -164,7 +170,6 @@ var Soldier = (function () {
         if (context_1.Context.getContext().map[this.pos.x][y] == null) {
             this.pos.y = y;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
     ;
@@ -176,7 +181,6 @@ var Soldier = (function () {
         if (context_1.Context.getContext().map[x][this.pos.y] == null) {
             this.pos.x = x;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
     ;
@@ -188,7 +192,6 @@ var Soldier = (function () {
         if (context_1.Context.getContext().map[x][this.pos.y] == null) {
             this.pos.x = x;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
     ;
@@ -313,11 +316,6 @@ var Robot = (function (_super) {
             case 3:
                 this.moveRight();
                 break;
-            case 4:
-                var x = Math.floor(Math.random() * constant_1.Constant.MAP_WIDTH_UNIT) - Math.floor(constant_1.Constant.MAP_WIDTH_UNIT / 2);
-                var y = Math.floor(Math.random() * constant_1.Constant.MAP_HEIGHT_UNIT) - Math.floor(constant_1.Constant.MAP_HEIGHT_UNIT / 2);
-                this.shoot(x, y);
-                break;
         }
     };
     Robot.prototype.moveToward = function (soldier) {
@@ -331,6 +329,9 @@ var Robot = (function (_super) {
         }
     };
     Robot.prototype.shootToward = function (soldier) {
+        if (soldier.color == this.color) {
+            console.log(this);
+        }
         var xDelta = soldier.pos.x - this.pos.x;
         var yDelta = soldier.pos.y - this.pos.y;
         this.shoot(xDelta, yDelta);
@@ -376,7 +377,8 @@ var Robot = (function (_super) {
         var nearestEnemy = null;
         for (var dist = 1; dist < constant_1.Constant.SIGHT_RANGE_UNIT; dist++) {
             for (var i = -dist; i <= dist; i++) {
-                var soldier = this.probePosition(dist, i);
+                var soldier = null;
+                soldier = this.probePosition(dist, i);
                 if (soldier != null) {
                     if (soldier.color == this.color) {
                         if (nearestFriend == null) {
@@ -671,10 +673,6 @@ var checkWinner = function () {
 };
 var run = function () {
     if (context_1.Context.getContext().gameRunning) {
-        checkWinner();
-        resetMap();
-        updateDistMatrix();
-        updateHealth();
         for (var i in context_1.Context.getContext().soldierList) {
             var soldier = context_1.Context.getContext().soldierList[i];
             soldier.refresh();
@@ -689,6 +687,10 @@ var run = function () {
                 }
             }
         }
+        checkWinner();
+        resetMap();
+        updateDistMatrix();
+        updateHealth();
         postMessageType(message_1.MessageType.ANSWER_RUNNING);
         setTimeout(run, 10);
     }

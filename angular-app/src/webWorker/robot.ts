@@ -21,11 +21,6 @@ export class Robot extends Soldier {
             case 3:
                 this.moveRight();
                 break;
-            case 4:
-                let x = Math.floor(Math.random() * Constant.MAP_WIDTH_UNIT) - Math.floor(Constant.MAP_WIDTH_UNIT/2);
-                let y = Math.floor(Math.random() * Constant.MAP_HEIGHT_UNIT) - Math.floor(Constant.MAP_HEIGHT_UNIT/2);
-                this.shoot(x, y);
-                break;
         }
     }
 
@@ -87,7 +82,8 @@ export class Robot extends Soldier {
         let nearestEnemy = null;
         for (let dist = 1; dist < Constant.SIGHT_RANGE_UNIT; dist++) {
             for (let i = -dist; i <= dist; i++) {
-                let soldier = this.probePosition(dist, i);
+                let soldier = null;
+                soldier = this.probePosition(dist, i);
                 if (soldier != null) {
                     if (soldier.color == this.color) {
                         if (nearestFriend == null) {

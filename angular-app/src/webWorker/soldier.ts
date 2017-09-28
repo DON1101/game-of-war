@@ -8,11 +8,12 @@ export class Position {
 export class Soldier {
     protected id;
     protected pos;
-    public color = "#000000";
+    protected color = "#000000";
     protected hp = 100;
     protected alive = true;
     protected bullet = null;
     protected actionQuota = 1;
+    protected shooter: Soldier = null;
 
     constructor(position:Position, color:string) {
         this.id = Context.getContext().nextSoldierId++;
@@ -21,6 +22,8 @@ export class Soldier {
     }
 
     public refresh() {
+        this.bullet = null;
+        this.shooter = null;
         this.actionQuota = 1;
         this.alive = (this.hp > 0);
     }
@@ -78,6 +81,7 @@ export class Soldier {
     private shotBy(shooter:Soldier, distance:number) {
         let harm = Math.max(1 - distance/Constant.SHOOT_RANGE_UNIT, 0);
         this.hp -= harm;
+        this.shooter = shooter;
     }
 
     public moveUp() {
@@ -88,7 +92,6 @@ export class Soldier {
         if (Context.getContext().map[this.pos.x][y] == null) {
             this.pos.y = y;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
 
@@ -100,7 +103,6 @@ export class Soldier {
         if (Context.getContext().map[this.pos.x][y] == null) {
             this.pos.y = y;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
 
@@ -112,7 +114,6 @@ export class Soldier {
         if (Context.getContext().map[x][this.pos.y] == null) {
             this.pos.x = x;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
 
@@ -124,7 +125,6 @@ export class Soldier {
         if (Context.getContext().map[x][this.pos.y] == null) {
             this.pos.x = x;
         }
-        this.bullet = null;
         this.actionQuota--;
     };
 

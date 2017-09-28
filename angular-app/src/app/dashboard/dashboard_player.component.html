@@ -1,8 +1,7 @@
 <div id="instruction-code">
     <div>Program your soldiers:</div>
-    <button id="but-apply-code">Apply your code</button>
+    <button id="but-apply-code" (click)="applyCode()">Apply your code</button>
     <br>
-    <textarea id="code-area" rows="50" cols="100">
-        {{playerCode}}
+    <textarea id="code-area" rows="50" cols="100" [(ngModel)]="playerCode">
     </textarea>
 </div>

@@ -160,11 +160,6 @@ let checkWinner = function() {
 
 let run = function() {
     if (Context.getContext().gameRunning) {
-        checkWinner();
-        resetMap();
-        updateDistMatrix();
-        updateHealth();
-
         for (let i in Context.getContext().soldierList) {
             let soldier = Context.getContext().soldierList[i];
             soldier.refresh();
@@ -178,6 +173,10 @@ let run = function() {
                 }
             }
         }
+        checkWinner();
+        resetMap();
+        updateDistMatrix();
+        updateHealth();
         postMessageType(MessageType.ANSWER_RUNNING);
         setTimeout(run, 10);
     }
