@@ -7,11 +7,6 @@
     float: left;
     overflow: scroll;
 }
-#instruction-code {
-    width: 100%;
-    float: left;
-    overflow: scroll;
-}
 .health-bar {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

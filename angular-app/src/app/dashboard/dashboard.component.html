@@ -1,5 +1,5 @@
 <div id="dashboard">
-    <dashboard-player [playerCode]="playerCode" (onCodeApplied)="onCodeApplied($event)"></dashboard-player>
+    <dashboard-player *ngIf="playerCodeEditting" [playerCode]="playerCode" (onCodeApplied)="onCodeApplied($event)"></dashboard-player>
 
     <div *ngIf="gameRunning" class="alert alert-info font-bold" role="alert">
         战斗中...
@@ -48,6 +48,9 @@
         </button>
         <button type="button" class="btn btn-warning" aria-haspopup="true" aria-expanded="false" (click)="resetGame()">
             Reset
+        </button>
+        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="playerCodeEditting=!playerCodeEditting">
+            Edit your code
         </button>
     </div>
 

@@ -29,6 +29,7 @@ export class DashboardComponent {
     private timeElapsed = 0;
     private subscription = null;
     private playerCode = Constant.PLAYER_CODE_DEFAULT;
+    private playerCodeEditting = false;
 
     // Context fetched from web worker
     dictSoldierNum = {};
@@ -141,6 +142,7 @@ export class DashboardComponent {
     }
 
     public onCodeApplied(playerCode: string) {
+        this.playerCodeEditting = false;
         this.playerCode = playerCode;
         this.resetGame();
     }
