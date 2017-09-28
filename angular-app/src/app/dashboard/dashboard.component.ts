@@ -1,11 +1,15 @@
 import { Component, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
 import { Constant } from '../constant';
 import { Message, MessageType } from '../../base/message';
 
 @Component({
     selector: 'dashboard',
     templateUrl: './dashboard.component.html',
-    styleUrls: ['../app.component.css'],
+    styleUrls: [
+        '../app.component.css',
+        "../../../node_modules/bootstrap/dist/css/bootstrap.min.css"
+    ],
     providers: [
         { provide: Window, useValue: window }  
     ]
@@ -20,12 +24,16 @@ export class DashboardComponent {
 
     private worker: Worker;
     private requestAnimFrame;
+    private canvas = null;
+    private context = null;
+    private timeElapsed = 0;
+    private subscription = null;
+    private playerCode = Constant.PLAYER_CODE_DEFAULT;
 
+    // Context fetched from web worker
     dictSoldierNum = {};
     youWin = null;
-    timeElapsed = 0;
-    canvas = null;
-    context = null;
+    gameRunning = false;
     soldierList = [];
 
     @ViewChild("canvasGame") canvasRef: ElementRef;
@@ -38,7 +46,13 @@ export class DashboardComponent {
                 continue;
             }
             this.context.fillStyle = soldier.color;
-            this.context.fillRect(soldier.pos.x*Constant.UNIT_SIZE, soldier.pos.y*Constant.UNIT_SIZE, Constant.UNIT_SIZE, Constant.UNIT_SIZE);
+            this.context.globalAlpha = soldier.hp / 100.0;
+            this.context.fillRect(
+                soldier.pos.x*Constant.UNIT_SIZE, 
+                soldier.pos.y*Constant.UNIT_SIZE, 
+                Constant.UNIT_SIZE, 
+                Constant.UNIT_SIZE);
+            this.context.globalAlpha = 1.0;
         }
     }
 
@@ -47,7 +61,11 @@ export class DashboardComponent {
         this.soldierList = message.param.get("soldierList");
         this.dictSoldierNum = message.param.get("dictSoldierNum");
         this.youWin = message.param.get("youWin");
+        this.gameRunning = message.param.get("gameRunning");
         this.requestAnimFrame(this.drawMap);
+        if (message.type == MessageType.ANSWER_GAME_OVER) {
+            this.stopTimer();
+        }
     }
 
     private initWebWorker = () => {
@@ -64,19 +82,51 @@ export class DashboardComponent {
             };
     }
 
+    private startTimer = () => {
+        this.stopTimer();
+        this.subscription = Observable.interval(1000).subscribe(res => {
+            this.timeElapsed++;
+            if (Constant.GAME_TOTAL_TIME > 0 && this.timeElapsed >= Constant.GAME_TOTAL_TIME) {
+                this.terminateGame();
+            }
+        });
+    }
+
+    private stopTimer = () => {
+        if (this.subscription != null) {
+            this.subscription.unsubscribe();
+        }
+    }
+
+    private resetTimer = () => {
+        this.stopTimer();
+        this.timeElapsed = 0;
+    }
+
     public startGame = () => {
-        let message = new Message(MessageType.START, null);
+        let message = new Message(MessageType.ASK_START, null);
         this.worker.postMessage(message);
+        this.startTimer();
     }
 
     public stopGame = () => {
-        let message = new Message(MessageType.STOP, null);
+        let message = new Message(MessageType.ASK_STOP, null);
         this.worker.postMessage(message);
+        this.stopTimer();
+    }
+
+    public terminateGame = () => {
+        let message = new Message(MessageType.ASK_TERMINATE, null);
+        this.worker.postMessage(message);
+        this.stopTimer();
     }
 
     public resetGame = () => {
-        let message = new Message(MessageType.RESET, null);
+        let param = new Map<String, any>();
+        param.set("playerCode", this.playerCode);
+        let message = new Message(MessageType.ASK_RESET, param);
         this.worker.postMessage(message);
+        this.resetTimer();
     }
 
     ngOnInit() {

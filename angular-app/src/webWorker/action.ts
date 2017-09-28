@@ -8,20 +8,24 @@ import { Message, MessageType } from '../base/message';
 onmessage = (e: MessageEvent) => {
     let message = e.data;
     switch (parseInt(message.type)) {
-        case MessageType.START:
+        case MessageType.ASK_START:
+            Context.getContext().gameRunning = true;
             start();
             break;
-        case MessageType.STOP:
+        case MessageType.ASK_STOP:
             Context.getContext().gameRunning = false;
             break;
-        case MessageType.RESET:
+        case MessageType.ASK_RESET:
+            Player.resetPlayer(message.param.get("playerCode"));
             Context.newContext();
             initMap();
             initSoldierRand();
             initSoldierNumDict();
             initDistMatrix();
-            Context.getContext().gameRunning = true;
-            postMessageType(MessageType.RUNNING);
+            postMessageType(MessageType.ANSWER_RUNNING);
+            break;
+        case MessageType.ASK_TERMINATE:
+            Context.getContext().gameTerminated = true;
             break;
         default:
             break;
@@ -144,14 +148,13 @@ let checkWinner = function() {
             end = true;
         }
     }
+    if (Context.getContext().gameTerminated) {
+        end = true;
+    }
     if (end) {
         Context.getContext().youWin = Context.getContext().dictSoldierNum[Constant.COLOR_LIST[0]]>Context.getContext().dictSoldierNum[Constant.COLOR_LIST[1]];
-        if (Context.getContext().youWin) {
-            postMessageType(MessageType.YOU_WIN);
-        } else {
-            postMessageType(MessageType.YOU_LOSE);
-        }
         Context.getContext().gameRunning = false;
+        postMessageType(MessageType.ANSWER_GAME_OVER);
     }
 }
 
@@ -175,7 +178,7 @@ let run = function() {
                 }
             }
         }
-        postMessageType(MessageType.RUNNING);
+        postMessageType(MessageType.ANSWER_RUNNING);
         setTimeout(run, 10);
     }
 }
@@ -185,6 +188,7 @@ let postMessageType = function(messageType: MessageType) {
     param.set("soldierList", Context.getContext().soldierList);
     param.set("dictSoldierNum", Context.getContext().dictSoldierNum);
     param.set("youWin", Context.getContext().youWin);
+    param.set("gameRunning", Context.getContext().gameRunning);
     let message = new Message(messageType, param);
     postMessage.apply(null, [message]);
 }

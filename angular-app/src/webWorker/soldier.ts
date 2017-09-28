@@ -25,6 +25,10 @@ export class Soldier {
         this.alive = (this.hp > 0);
     }
 
+    public getHp() {
+        return this.hp;
+    }
+
     // Probe a position relative to self, e.g (1, 1), (-1, -1)
     // Return the soldier in the probed position if any
     public probePosition(relativeX:number, relativeY:number): Soldier {

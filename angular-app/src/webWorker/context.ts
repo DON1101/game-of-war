@@ -2,7 +2,8 @@ export class Context {
     private static singleton = null;
 
     constructor(
-        public gameRunning = true,
+        public gameRunning = false,
+        public gameTerminated = false,
         public distMatrix = null,
         public map = null,
         public dictSoldierNum = {},

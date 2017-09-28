@@ -6,7 +6,6 @@
     width: 100%;
     float: left;
     overflow: scroll;
-    /*margin-left: 10px;*/
 }
 #instruction-code {
     width: 100%;
@@ -45,8 +44,6 @@
 .font-bold {
     font-weight: bold;
 }
-.your-result {
-    font-weight: bold;
-    margin-left: 36px;
-    font-size: 30px;
+#war-field {
+  margin-top: 10px;
 }

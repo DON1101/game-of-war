@@ -6,26 +6,13 @@ export class Player extends Soldier {
         super(position, color);
     }
 
+    public static resetPlayer(playerCode:string) {
+        Constant.PLAYER_CODE_DEFAULT; // We should keep this here, otherwise "constant_1" cannot be found
+        let finalCode = playerCode.replace(new RegExp("Constant\.", 'g'), "constant_1.Constant.");
+        eval(finalCode);
+    }
+
     public nextAction() {
-        let i = Math.floor(Math.random() * 5);
-        switch(i) {
-            case 0:
-                this.moveUp();
-                break;
-            case 1:
-                this.moveDown();
-                break;
-            case 2:
-                this.moveLeft();
-                break;
-            case 3:
-                this.moveRight();
-                break;
-            case 4:
-                let x = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);
-                let y = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);
-                this.shoot(x, y);
-                break;
-        }
-    };
+        Player.prototype["playerFunc"](this);
+    }
 };

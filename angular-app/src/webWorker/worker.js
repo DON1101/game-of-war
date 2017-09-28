@@ -230,7 +230,8 @@ Constant.COLOR_NUM = 2;
 Constant.COLOR_LIST = ["red", "blue", "green", "black", "purple"];
 Constant.SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
 Constant.SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
-Constant.GAME_TOTAL_TIME = 60; // in seconds
+Constant.GAME_TOTAL_TIME = -1; // in seconds
+Constant.PLAYER_CODE_DEFAULT = "\nPlayer.prototype.playerFunc = function(self) {\n/* \u6BCF\u4E00\u8F6E\u884C\u52A8\u4E2D\uFF0C\u58EB\u5175\u6700\u591A\u53EF\u4EE5\u6D88\u80171\u4E2A\u884C\u52A8\u6570\uFF0C\u58EB\u5175\u53EF\u4EE5\u6709\u5982\u4E0B\u884C\u52A8\u6307\u4EE4\uFF1A\nself.moveUp()\n    \u5411\u4E0A\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.moveDown()\n    \u5411\u4E0B\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.moveLeft()\n    \u5411\u5DE6\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.moveRight()\n    \u5411\u53F3\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.shoot(relativeX, relativeY)\n    \u5411\u67D0\u4E2A\u76F8\u5BF9\u65B9\u5411\u5F00\u67AA\u5C04\u51FB\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.probePosition(relativeX, relativeY)\n    \u4FA6\u67E5\u67D0\u4E2A\u76F8\u5BF9\u4F4D\u7F6E\uFF0C\u5982\u679C\u8BE5\u4F4D\u7F6E\u6709\u58EB\u5175\uFF0C\u5219\u8FD4\u56DE\u8BE5\u58EB\u5175\u5BF9\u8C61\uFF0C\u5426\u5219\u8FD4\u56DEnull\u3002\u8BE5\u6307\u4EE4\u6D88\u80170\u4E2A\u884C\u52A8\u6570\u3002\n*/\nlet i = Math.floor(Math.random() * 5);\nswitch(i) {\n    case 0:\n        self.moveUp();\n        break;\n    case 1:\n        self.moveDown();\n        break;\n    case 2:\n        self.moveLeft();\n        break;\n    case 3:\n        self.moveRight();\n        break;\n    case 4:\n        let x = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);\n        let y = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);\n        self.shoot(x, y);\n        break;\n}\n}\n    ";
 exports.Constant = Constant;
 
 
@@ -242,8 +243,9 @@ exports.Constant = Constant;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Context = (function () {
-    function Context(gameRunning, distMatrix, map, dictSoldierNum, youWin, soldierList, nextSoldierId) {
-        if (gameRunning === void 0) { gameRunning = true; }
+    function Context(gameRunning, gameTerminated, distMatrix, map, dictSoldierNum, youWin, soldierList, nextSoldierId) {
+        if (gameRunning === void 0) { gameRunning = false; }
+        if (gameTerminated === void 0) { gameTerminated = false; }
         if (distMatrix === void 0) { distMatrix = null; }
         if (map === void 0) { map = null; }
         if (dictSoldierNum === void 0) { dictSoldierNum = {}; }
@@ -251,6 +253,7 @@ var Context = (function () {
         if (soldierList === void 0) { soldierList = null; }
         if (nextSoldierId === void 0) { nextSoldierId = 0; }
         this.gameRunning = gameRunning;
+        this.gameTerminated = gameTerminated;
         this.distMatrix = distMatrix;
         this.map = map;
         this.dictSoldierNum = dictSoldierNum;
@@ -483,29 +486,14 @@ var Player = (function (_super) {
     function Player(position, color) {
         return _super.call(this, position, color) || this;
     }
-    Player.prototype.nextAction = function () {
-        var i = Math.floor(Math.random() * 5);
-        switch (i) {
-            case 0:
-                this.moveUp();
-                break;
-            case 1:
-                this.moveDown();
-                break;
-            case 2:
-                this.moveLeft();
-                break;
-            case 3:
-                this.moveRight();
-                break;
-            case 4:
-                var x = Math.floor(Math.random() * constant_1.Constant.SIGHT_RANGE_UNIT) - Math.floor(constant_1.Constant.SIGHT_RANGE_UNIT / 2);
-                var y = Math.floor(Math.random() * constant_1.Constant.SIGHT_RANGE_UNIT) - Math.floor(constant_1.Constant.SIGHT_RANGE_UNIT / 2);
-                this.shoot(x, y);
-                break;
-        }
+    Player.resetPlayer = function (playerCode) {
+        constant_1.Constant.PLAYER_CODE_DEFAULT; // We should keep this here, otherwise "constant_1" cannot be found
+        var finalCode = playerCode.replace(new RegExp("Constant\.", 'g'), "constant_1.Constant.");
+        eval(finalCode);
     };
-    ;
+    Player.prototype.nextAction = function () {
+        Player.prototype["playerFunc"](this);
+    };
     return Player;
 }(soldier_1.Soldier));
 exports.Player = Player;
@@ -539,20 +527,24 @@ var message_1 = __webpack_require__(7);
 onmessage = function (e) {
     var message = e.data;
     switch (parseInt(message.type)) {
-        case message_1.MessageType.START:
+        case message_1.MessageType.ASK_START:
+            context_1.Context.getContext().gameRunning = true;
             start();
             break;
-        case message_1.MessageType.STOP:
+        case message_1.MessageType.ASK_STOP:
             context_1.Context.getContext().gameRunning = false;
             break;
-        case message_1.MessageType.RESET:
+        case message_1.MessageType.ASK_RESET:
+            player_1.Player.resetPlayer(message.param.get("playerCode"));
             context_1.Context.newContext();
             initMap();
             initSoldierRand();
             initSoldierNumDict();
             initDistMatrix();
-            context_1.Context.getContext().gameRunning = true;
-            postMessageType(message_1.MessageType.RUNNING);
+            postMessageType(message_1.MessageType.ANSWER_RUNNING);
+            break;
+        case message_1.MessageType.ASK_TERMINATE:
+            context_1.Context.getContext().gameTerminated = true;
             break;
         default:
             break;
@@ -668,15 +660,13 @@ var checkWinner = function () {
             end = true;
         }
     }
+    if (context_1.Context.getContext().gameTerminated) {
+        end = true;
+    }
     if (end) {
         context_1.Context.getContext().youWin = context_1.Context.getContext().dictSoldierNum[constant_1.Constant.COLOR_LIST[0]] > context_1.Context.getContext().dictSoldierNum[constant_1.Constant.COLOR_LIST[1]];
-        if (context_1.Context.getContext().youWin) {
-            postMessageType(message_1.MessageType.YOU_WIN);
-        }
-        else {
-            postMessageType(message_1.MessageType.YOU_LOSE);
-        }
         context_1.Context.getContext().gameRunning = false;
+        postMessageType(message_1.MessageType.ANSWER_GAME_OVER);
     }
 };
 var run = function () {
@@ -699,7 +689,7 @@ var run = function () {
                 }
             }
         }
-        postMessageType(message_1.MessageType.RUNNING);
+        postMessageType(message_1.MessageType.ANSWER_RUNNING);
         setTimeout(run, 10);
     }
 };
@@ -708,6 +698,7 @@ var postMessageType = function (messageType) {
     param.set("soldierList", context_1.Context.getContext().soldierList);
     param.set("dictSoldierNum", context_1.Context.getContext().dictSoldierNum);
     param.set("youWin", context_1.Context.getContext().youWin);
+    param.set("gameRunning", context_1.Context.getContext().gameRunning);
     var message = new message_1.Message(messageType, param);
     postMessage.apply(null, [message]);
 };
@@ -725,12 +716,12 @@ var start = function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var MessageType;
 (function (MessageType) {
-    MessageType[MessageType["START"] = 0] = "START";
-    MessageType[MessageType["STOP"] = 1] = "STOP";
-    MessageType[MessageType["RESET"] = 2] = "RESET";
-    MessageType[MessageType["RUNNING"] = 3] = "RUNNING";
-    MessageType[MessageType["YOU_WIN"] = 4] = "YOU_WIN";
-    MessageType[MessageType["YOU_LOSE"] = 5] = "YOU_LOSE";
+    MessageType[MessageType["ASK_START"] = 0] = "ASK_START";
+    MessageType[MessageType["ASK_STOP"] = 1] = "ASK_STOP";
+    MessageType[MessageType["ASK_RESET"] = 2] = "ASK_RESET";
+    MessageType[MessageType["ASK_TERMINATE"] = 3] = "ASK_TERMINATE";
+    MessageType[MessageType["ANSWER_RUNNING"] = 100] = "ANSWER_RUNNING";
+    MessageType[MessageType["ANSWER_GAME_OVER"] = 101] = "ANSWER_GAME_OVER";
 })(MessageType = exports.MessageType || (exports.MessageType = {}));
 var Message = (function () {
     function Message(type, param) {

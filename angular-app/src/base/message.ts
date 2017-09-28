@@ -1,10 +1,10 @@
 export enum MessageType {
-    START = 0,
-    STOP = 1,
-    RESET = 2,
-    RUNNING = 3,
-    YOU_WIN = 4,
-    YOU_LOSE = 5
+    ASK_START = 0,
+    ASK_STOP = 1,
+    ASK_RESET = 2,
+    ASK_TERMINATE = 3,
+    ANSWER_RUNNING = 100,
+    ANSWER_GAME_OVER = 101,
 }
 
 export class Message {
