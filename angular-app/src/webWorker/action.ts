@@ -178,7 +178,7 @@ let run = function() {
         updateDistMatrix();
         updateHealth();
         postMessageType(MessageType.ANSWER_RUNNING);
-        setTimeout(run, 10);
+        setTimeout(run, 1);
     }
 }
 

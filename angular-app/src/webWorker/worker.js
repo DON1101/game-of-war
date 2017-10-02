@@ -234,7 +234,7 @@ Constant.COLOR_LIST = ["red", "blue", "green", "black", "purple"];
 Constant.SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
 Constant.SHOOT_RANGE_UNIT = 50; // how far can a bullet can shoot
 Constant.GAME_TOTAL_TIME = -1; // in seconds
-Constant.PLAYER_CODE_DEFAULT = "\nPlayer.prototype.playerFunc = function(self) {\n/* \u6BCF\u4E00\u8F6E\u884C\u52A8\u4E2D\uFF0C\u58EB\u5175\u6700\u591A\u53EF\u4EE5\u6D88\u80171\u4E2A\u884C\u52A8\u6570\uFF0C\u58EB\u5175\u53EF\u4EE5\u6709\u5982\u4E0B\u884C\u52A8\u6307\u4EE4\uFF1A\nself.moveUp()\n    \u5411\u4E0A\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.moveDown()\n    \u5411\u4E0B\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.moveLeft()\n    \u5411\u5DE6\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.moveRight()\n    \u5411\u53F3\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.shoot(relativeX, relativeY)\n    \u5411\u67D0\u4E2A\u76F8\u5BF9\u65B9\u5411\u5F00\u67AA\u5C04\u51FB\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\nself.probePosition(relativeX, relativeY)\n    \u4FA6\u67E5\u67D0\u4E2A\u76F8\u5BF9\u4F4D\u7F6E\uFF0C\u5982\u679C\u8BE5\u4F4D\u7F6E\u6709\u58EB\u5175\uFF0C\u5219\u8FD4\u56DE\u8BE5\u58EB\u5175\u5BF9\u8C61\uFF0C\u5426\u5219\u8FD4\u56DEnull\u3002\u8BE5\u6307\u4EE4\u6D88\u80170\u4E2A\u884C\u52A8\u6570\u3002\n*/\nlet i = Math.floor(Math.random() * 5);\nswitch(i) {\n    case 0:\n        self.moveUp();\n        break;\n    case 1:\n        self.moveDown();\n        break;\n    case 2:\n        self.moveLeft();\n        break;\n    case 3:\n        self.moveRight();\n        break;\n    case 4:\n        let x = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);\n        let y = Math.floor(Math.random() * Constant.SIGHT_RANGE_UNIT) - Math.floor(Constant.SIGHT_RANGE_UNIT/2);\n        self.shoot(x, y);\n        break;\n}\n}\n    ";
+Constant.PLAYER_CODE_DEFAULT = "\nPlayer.prototype.playerFunc = function(self) {\n    /* \u6BCF\u4E00\u8F6E\u884C\u52A8\u4E2D\uFF0C\u58EB\u5175\u6700\u591A\u53EF\u4EE5\u6D88\u80171\u4E2A\u884C\u52A8\u6570\uFF0C\u58EB\u5175\u53EF\u4EE5\u6709\u5982\u4E0B\u884C\u52A8\u6307\u4EE4\uFF1A\n    self.moveUp()\n        \u5411\u4E0A\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\n    self.moveDown()\n        \u5411\u4E0B\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\n    self.moveLeft()\n        \u5411\u5DE6\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\n    self.moveRight()\n        \u5411\u53F3\u79FB\u52A8\u4E00\u4E2A\u5355\u4F4D\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\n    self.shoot(relativeX, relativeY)\n        \u5411\u67D0\u4E2A\u76F8\u5BF9\u65B9\u5411\u5F00\u67AA\u5C04\u51FB\uFF0C\u8BE5\u6307\u4EE4\u6D88\u80171\u4E2A\u884C\u52A8\u6570\u3002\n    self.probePosition(relativeX, relativeY)\n        \u4FA6\u67E5\u67D0\u4E2A\u76F8\u5BF9\u4F4D\u7F6E\uFF0C\u5982\u679C\u8BE5\u4F4D\u7F6E\u6709\u58EB\u5175\uFF0C\u5219\u8FD4\u56DE\u8BE5\u58EB\u5175\u5BF9\u8C61\uFF0C\u5426\u5219\u8FD4\u56DEnull\u3002\u8BE5\u6307\u4EE4\u6D88\u80170\u4E2A\u884C\u52A8\u6570\u3002\n    */\n    let i = Math.floor(Math.random() * 5);\n    switch(i) {\n        case 0:\n            self.moveUp();\n            break;\n        case 1:\n            self.moveDown();\n            break;\n        case 2:\n            self.moveLeft();\n            break;\n        case 3:\n            self.moveRight();\n            break;\n        case 4:\n            let x = Math.random();\n            let y = Math.random();\n            self.shoot(x, y);\n            break;\n    }\n}\n    ";
 exports.Constant = Constant;
 
 
@@ -329,9 +329,6 @@ var Robot = (function (_super) {
         }
     };
     Robot.prototype.shootToward = function (soldier) {
-        if (soldier.color == this.color) {
-            console.log(this);
-        }
         var xDelta = soldier.pos.x - this.pos.x;
         var yDelta = soldier.pos.y - this.pos.y;
         this.shoot(xDelta, yDelta);
@@ -692,7 +689,7 @@ var run = function () {
         updateDistMatrix();
         updateHealth();
         postMessageType(message_1.MessageType.ANSWER_RUNNING);
-        setTimeout(run, 10);
+        setTimeout(run, 1);
     }
 };
 var postMessageType = function (messageType) {
