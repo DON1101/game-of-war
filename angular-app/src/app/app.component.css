@@ -3,9 +3,7 @@
   background: #c7c7e4;
 }
 #dashboard {
-    width: 100%;
-    float: left;
-    overflow: scroll;
+  width: 100%;
 }
 .health-bar {
   -webkit-box-sizing: border-box;
@@ -42,4 +40,5 @@
 }
 #war-field {
   margin-top: 10px;
+  overflow: scroll;
 }

@@ -1,0 +1,22 @@
+<table>
+    <tr>
+        <td class="col-md-2">你的策略</td>
+        <td>
+            <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="editCode()">
+                编辑代码
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-md-2">选择对手</td>
+        <td>
+            <select class="selectpicker">
+              <option>Robot1</option>
+              <option>Robot2</option>
+              <option>Robot3</option>
+            </select>
+        </td>
+    </tr>
+</table>
+<button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="train()">演习</button>
+<button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="fight()">正式战斗</button>

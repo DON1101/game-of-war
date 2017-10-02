@@ -4,6 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ProvidePlugin = require('webpack').ProvidePlugin;
 const autoprefixer = require('autoprefixer');
 const postcssUrl = require('postcss-url');
 const cssnano = require('cssnano');
@@ -63,7 +64,8 @@ module.exports = {
   "resolve": {
     "extensions": [
       ".ts",
-      ".js"
+      ".js",
+      ".css"
     ],
     "modules": [
       "./node_modules",
@@ -86,6 +88,9 @@ module.exports = {
     ],
     "styles": [
       "./src/styles.css"
+    ],
+    "vendor": [
+      "./src/vendor.ts"
     ]
   },
   "output": {
@@ -467,6 +472,11 @@ module.exports = {
       "exclude": [],
       "tsConfigPath": "src/tsconfig.app.json",
       "skipCodeGeneration": true
+    }),
+    new ProvidePlugin({   
+        jQuery: 'jquery',
+        $: 'jquery',
+        jquery: 'jquery'
     })
   ],
   "node": {

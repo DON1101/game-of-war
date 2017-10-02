@@ -8,7 +8,8 @@ import {
 }) 
 
 export class RangePipe implements PipeTransform { 
-   transform(value: number[], limit: number): number[] { 
+   transform(value: number[], limit: number): number[] {
+      value = [];
       for (var i = 0; i < limit; i++) {
           value.push(i);
       }

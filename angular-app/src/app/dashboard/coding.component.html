@@ -2,7 +2,8 @@
     <div class="panel panel-default">
       <div class="panel-heading">
         Program your soldiers
-        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">Apply your code</button>
+        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">确定</button>
+        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">取消</button>
       </div>
       <div class="panel-body">
         <textarea id="code-area" class="width-max" rows="50" cols="2" [(ngModel)]="playerCode"></textarea>
