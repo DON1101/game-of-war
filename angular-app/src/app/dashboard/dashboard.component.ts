@@ -18,16 +18,20 @@ export class DashboardComponent {
     private view: View = View.PREPARING;
 
     public onCodeApplied(playerCode: string) {
-        this.view = View.FIGHTING;
+        this.view = View.PREPARING;
         this.playerCode = playerCode;
-        this.compBattleField.resetGame();
     }
 
-    public onCodeEdit() {
+    public changeViewCoding() {
         this.view = View.CODING;
     }
 
-    public onCancelCodeEdit() {
+    public changeViewPreparing() {
+        this.view = View.PREPARING;
+    }
+
+    public startBattle() {
+        this.compBattleField.resetGame();
         this.view = View.FIGHTING;
     }
 }

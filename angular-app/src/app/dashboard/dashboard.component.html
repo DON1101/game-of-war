@@ -2,21 +2,22 @@
     <dashboard-preparing
     [hidden]="view!=View.PREPARING"
     [playerCode]="playerCode"
-    (onTrain)="onCodeApplied($event)"
-    (onFight)="onCodeApplied($event)"
+    (onTrain)="startBattle($event)"
+    (onFight)="startBattle($event)"
+    (onCodeEdit)="changeViewCoding($event)"
     ></dashboard-preparing>
 
     <dashboard-coding 
     [hidden]="view!=View.CODING" 
     [playerCode]="playerCode" 
     (onCodeApplied)="onCodeApplied($event)"
-    (onCancel)="onCancelCodeEdit($event)"
+    (onCancel)="changeViewPreparing($event)"
     ></dashboard-coding>
 
     <battle-field
     [hidden]="view!=View.FIGHTING"
     [playerCode]="playerCode"
-    (onCodeEdit)="onCodeEdit($event)"
+    (onPrepare)="changeViewPreparing($event)"
     ></battle-field>
 
 </div>

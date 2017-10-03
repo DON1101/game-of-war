@@ -1,12 +1,16 @@
 <div id="instruction-code">
     <div class="panel panel-default">
       <div class="panel-heading">
-        Program your soldiers
-        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">确定</button>
-        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">取消</button>
+        编写你的策略
       </div>
       <div class="panel-body">
+        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">确定</button>
+        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">取消</button>
+
         <textarea id="code-area" class="width-max" rows="50" cols="2" [(ngModel)]="playerCode"></textarea>
+
+        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">确定</button>
+        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">取消</button>
       </div>
     </div>
 </div>

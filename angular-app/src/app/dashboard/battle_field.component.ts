@@ -14,7 +14,7 @@ export class BattleFieldComponent {
     constructor(@Inject(Window) private _window: Window) {}
     @ViewChild("canvasGame") canvasRef: ElementRef;
     @Input() playerCode: string;
-    @Output() onCodeEdit = new EventEmitter<string>();
+    @Output() onPrepare = new EventEmitter<string>();
 
     COLOR_NUM = Constant.COLOR_NUM;
     COLOR_LIST = Constant.COLOR_LIST;
@@ -136,8 +136,8 @@ export class BattleFieldComponent {
         this.resetTimer();
     }
 
-    public editCode() {
-        this.onCodeEdit.emit();
+    public prepare() {
+        this.onPrepare.emit();
     }
 
     ngOnInit() {
