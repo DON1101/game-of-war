@@ -449,10 +449,10 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {
-        from: 'src/webWorker/worker.js'
+        from: 'dist/worker.bundle.js'
       },
       {
-        from: 'src/webWorker/worker.map'
+        from: 'dist/worker.bundle.js.map'
       },
       {
         from: 'src/assets',

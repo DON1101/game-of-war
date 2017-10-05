@@ -33,9 +33,9 @@ module.exports = {
     ]
   },
   output: {
-    path: helper.getRoot('src/webWorker'),
-    filename: "[name].js",
-    sourceMapFilename: '[name].map',
+    path: path.join(process.cwd(), "dist"),
+    filename: "[name].bundle.js",
+    sourceMapFilename: '[name].bundle.js.map',
   },
   devtool: 'source-map',
   resolve: {

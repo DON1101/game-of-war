@@ -76,7 +76,7 @@ export class BattleFieldComponent {
     }
 
     private initWebWorker = () => {
-        this.worker = new Worker('worker.js');
+        this.worker = new Worker('worker.bundle.js');
         this.worker.addEventListener('message', this.render);
     }
 
