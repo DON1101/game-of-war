@@ -2,6 +2,7 @@ export class Constant {
     public static UNIT_SIZE = 3; // px
     public static MAP_WIDTH_UNIT = 200;
     public static MAP_HEIGHT_UNIT = 200;
+    public static HEALTH_BAR_LENGTH_UNIT = 5;
     public static SOLDIER_NUM_EACH = 500;
     public static COLOR_NUM = 2;
     public static COLOR_LIST = ["red", "blue", "green", "black", "purple"];

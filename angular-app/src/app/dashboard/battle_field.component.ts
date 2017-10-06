@@ -41,14 +41,37 @@ export class BattleFieldComponent {
             if (!soldier.alive) {
                 continue;
             }
+
+            // Draw soldier
             this.context.fillStyle = soldier.color;
-            // this.context.globalAlpha = soldier.hp / 100.0;
             this.context.fillRect(
                 soldier.pos.x*Constant.UNIT_SIZE, 
                 soldier.pos.y*Constant.UNIT_SIZE, 
                 Constant.UNIT_SIZE, 
                 Constant.UNIT_SIZE);
-            // this.context.globalAlpha = 1.0;
+
+            // Draw health bar
+            var cutOff = Math.floor(soldier.hp / 100.0 * Constant.HEALTH_BAR_LENGTH_UNIT);
+            this.context.beginPath();
+            this.context.strokeStyle='green';
+            this.context.moveTo(
+                (soldier.pos.x - Constant.HEALTH_BAR_LENGTH_UNIT/2)*Constant.UNIT_SIZE, 
+                (soldier.pos.y - 1)*Constant.UNIT_SIZE);
+            this.context.lineTo(
+                (soldier.pos.x - Constant.HEALTH_BAR_LENGTH_UNIT/2 + cutOff)*Constant.UNIT_SIZE, 
+                (soldier.pos.y - 1)*Constant.UNIT_SIZE);
+            this.context.stroke();
+            this.context.beginPath();
+            this.context.strokeStyle='grey';
+            this.context.moveTo(
+                (soldier.pos.x - Constant.HEALTH_BAR_LENGTH_UNIT/2 + cutOff)*Constant.UNIT_SIZE, 
+                (soldier.pos.y - 1)*Constant.UNIT_SIZE);
+            this.context.lineTo(
+                (soldier.pos.x + Constant.HEALTH_BAR_LENGTH_UNIT/2)*Constant.UNIT_SIZE, 
+                (soldier.pos.y - 1)*Constant.UNIT_SIZE);
+            this.context.stroke();
+
+            // Draw shooting track
             if (soldier.shooter != null) {
                 this.context.beginPath();
                 this.context.strokeStyle = soldier.shooter.color;
