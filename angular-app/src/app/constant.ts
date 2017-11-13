@@ -34,6 +34,8 @@ Player.prototype.playerFunc = function(self) {
         侦查某个相对位置，如果该位置有士兵，则返回该士兵对象，否则返回null。
         该指令消耗0个行动数。
     */
+    let a = 0;
+    for(let i=0; i<99999; i++) a=i;
     let chance = new Chance();
     let i = chance.integer({min: 0, max: 4});
     switch(i) {

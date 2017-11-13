@@ -449,10 +449,22 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {
-        from: 'dist/worker.bundle.js'
+        from: 'dist/workerJudge.bundle.js'
       },
       {
-        from: 'dist/worker.bundle.js.map'
+        from: 'dist/workerJudge.bundle.js.map'
+      },
+      {
+        from: 'dist/workerRobot.bundle.js'
+      },
+      {
+        from: 'dist/workerRobot.bundle.js.map'
+      },
+      {
+        from: 'dist/workerPlayer.bundle.js'
+      },
+      {
+        from: 'dist/workerPlayer.bundle.js.map'
       },
       {
         from: 'src/assets',

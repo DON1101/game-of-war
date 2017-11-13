@@ -5,6 +5,9 @@ import { Robot } from './robot';
 import { Constant } from '../app/constant';
 import { Message, MessageType } from '../base/message';
 
+let workerPortRobot;
+let workerPortPlayer;
+
 onmessage = (e: MessageEvent) => {
     let message = e.data;
     switch (parseInt(message.type)) {
@@ -26,6 +29,12 @@ onmessage = (e: MessageEvent) => {
             break;
         case MessageType.ASK_TERMINATE:
             Context.getContext().gameTerminated = true;
+            break;
+        case MessageType.REPORT_CONNECT:
+            workerPortRobot = e.ports[0];
+            workerPortPlayer = e.ports[1];
+            break;
+        case MessageType.REPORT_SOLDIER_ACTION:
             break;
         default:
             break;

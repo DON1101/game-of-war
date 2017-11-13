@@ -21,7 +21,9 @@ export class BattleFieldComponent {
     GAME_TOTAL_TIME = Constant.GAME_TOTAL_TIME;
     SOLDIER_NUM_EACH = Constant.SOLDIER_NUM_EACH;
 
-    private worker: Worker;
+    private workerJudge: Worker;
+    private workerRobot: Worker;
+    private workerPlayer: Worker;
     private requestAnimFrame;
     private canvas = null;
     private context = null;
@@ -99,8 +101,23 @@ export class BattleFieldComponent {
     }
 
     private initWebWorker = () => {
-        this.worker = new Worker('worker.bundle.js');
-        this.worker.addEventListener('message', this.render);
+        this.workerJudge = new Worker('workerJudge.bundle.js');
+        let msgConnect = new Message(MessageType.REPORT_CONNECT, null);
+
+        let channelRobot = new MessageChannel();
+        this.workerRobot = new Worker('workerRobot.bundle.js');
+        this.workerRobot.postMessage(msgConnect, [channelRobot.port1]);
+
+        let channelPlayer = new MessageChannel();
+        this.workerPlayer = new Worker('workerPlayer.bundle.js');
+        this.workerPlayer.postMessage(msgConnect, [channelPlayer.port1]);
+
+        this.workerJudge.postMessage(msgConnect, [
+            channelRobot.port2,
+            channelPlayer.port2,
+        ]);
+
+        this.workerJudge.addEventListener('message', this.render);
     }
 
     private initRender = () => {
@@ -135,19 +152,19 @@ export class BattleFieldComponent {
 
     public startGame = () => {
         let message = new Message(MessageType.ASK_START, null);
-        this.worker.postMessage(message);
+        this.workerJudge.postMessage(message);
         this.startTimer();
     }
 
     public stopGame = () => {
         let message = new Message(MessageType.ASK_STOP, null);
-        this.worker.postMessage(message);
+        this.workerJudge.postMessage(message);
         this.stopTimer();
     }
 
     public terminateGame = () => {
         let message = new Message(MessageType.ASK_TERMINATE, null);
-        this.worker.postMessage(message);
+        this.workerJudge.postMessage(message);
         this.stopTimer();
     }
 
@@ -155,7 +172,7 @@ export class BattleFieldComponent {
         let param = new Map<String, any>();
         param.set("playerCode", this.playerCode);
         let message = new Message(MessageType.ASK_RESET, param);
-        this.worker.postMessage(message);
+        this.workerJudge.postMessage(message);
         this.resetTimer();
     }
 

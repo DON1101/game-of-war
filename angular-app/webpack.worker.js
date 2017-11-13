@@ -24,12 +24,24 @@ const WatchIgnorePlugin = require('webpack/lib/WatchIgnorePlugin');
 
 module.exports = {
   entry: {
-    'worker': [
+    'workerJudge': [
       './src/webWorker/context.ts',
       './src/webWorker/soldier.ts',
       './src/webWorker/robot.ts',
       './src/webWorker/player.ts',
-      './src/webWorker/action.ts',
+      './src/webWorker/workerJudge.ts',
+    ],
+    'workerRobot': [
+      './src/webWorker/context.ts',
+      './src/webWorker/soldier.ts',
+      './src/webWorker/robot.ts',
+      './src/webWorker/workerRobot.ts',
+    ],
+    'workerPlayer': [
+      './src/webWorker/context.ts',
+      './src/webWorker/soldier.ts',
+      './src/webWorker/player.ts',
+      './src/webWorker/workerPlayer.ts',
     ]
   },
   output: {
