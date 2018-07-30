@@ -7,29 +7,20 @@ import { Message, MessageType } from '../base/message';
 
 let workerPortRobot;
 let workerPortPlayer;
-let deadSet = new Set(); // Everybody only dies once
+let deadSet; // Everybody only dies once
 
 onmessage = (e: MessageEvent) => {
     let message = e.data;
-    let param = null;
     switch (parseInt(message.type)) {
         case MessageType.ASK_START:
             Context.getContext().gameRunning = true;
-
-            // Notify soldiers to start
-            param = new Map<String, any>();
-            param.set("context", Context.getContext());
-            let msgStart = new Message(MessageType.REPORT_SOLDIER_START, param);
-            workerPortPlayer.postMessage(msgStart);
-            workerPortRobot.postMessage(msgStart);
-
             start();
             break;
         case MessageType.ASK_STOP:
             Context.getContext().gameRunning = false;
             break;
         case MessageType.ASK_RESET:
-            Player.resetPlayer(message.param.get("playerCode"));
+            resetPlayerCode(message.param.get("playerCode"));
             Context.newContext();
             initMap();
             initSoldierRand();
@@ -55,16 +46,19 @@ let onmessageFromSoldier = function(event) {
     let message = event.data;
     let param = null;
     switch (parseInt(message.type)) {
-        case MessageType.REPORT_WAR_FIELD_CONTEXT:
-            param = new Map<String, any>();
-            param.set("context", Context.getContext());
-            let retMsg = new Message(MessageType.REPORT_WAR_FIELD_CONTEXT, param);
-            let color = message.param.get("color");
-            if (color == "red") {
-                workerPortPlayer.postMessage(retMsg);
-            } else {
-                workerPortRobot.postMessage(retMsg);
-            }
+        // case MessageType.REPORT_WAR_FIELD_CONTEXT:
+        //     param = new Map<String, any>();
+        //     param.set("context", Context.getContext());
+        //     let retMsg = new Message(MessageType.REPORT_WAR_FIELD_CONTEXT, param);
+        //     let color = message.param.get("color");
+        //     if (color == "red") {
+        //         workerPortPlayer.postMessage(retMsg);
+        //     } else {
+        //         workerPortRobot.postMessage(retMsg);
+        //     }
+        //     break;
+        case MessageType.LOGGING:
+            logging(message.value);
             break;
         case MessageType.REPORT_SOLDIER_ACTION:
             let soldierId = message.param.get("id");
@@ -107,6 +101,7 @@ let initMap = function() {
     }
     resetMap();
     Context.getContext().youWin = null;
+    deadSet = new Set();
     return Context.getContext().map;
 }
 
@@ -177,7 +172,7 @@ let updateDistMatrix = function() {
 let updateHealth = function() {
     for (let i = 0; i < Context.getContext().soldierList.length; i++) {
         let soldier1 = Context.getContext().soldierList[i];
-        if (!soldier1.alive || soldier1.bullet == null) {
+        if (!soldier1.getAlive() || soldier1.bullet == null) {
             continue;
         }
         let minDistFromVictimCandi = Number.MAX_SAFE_INTEGER;
@@ -187,7 +182,7 @@ let updateHealth = function() {
                 continue; // skip self
             }
             let soldier2 = Context.getContext().soldierList[j];
-            if (!soldier2.alive) {
+            if (!soldier2.getAlive()) {
                 continue;
             }
             let dist = Context.getContext().distMatrix[soldier1.id][soldier2.id];
@@ -227,35 +222,50 @@ let checkWinner = function() {
 
 let run = function() {
     if (Context.getContext().gameRunning) {
-        // for (let i in Context.getContext().soldierList) {
-        //     let soldier = Context.getContext().soldierList[i];
-        //     soldier.refresh();
-        //     if (soldier.alive) {
-        //         try {
-        //             soldier.nextAction();
-        //         } catch(e) {
-        //             console.log("Error: " + e);
-        //             Context.getContext().gameRunning = false;
-        //             return;
-        //         }
-        //     }
-        // }
         checkWinner();
         resetMap();
         updateDistMatrix();
         updateHealth();
         postMessageType(MessageType.ANSWER_RUNNING);
+
+        for (let i in Context.getContext().soldierList) {
+            let soldier = Context.getContext().soldierList[i];
+            soldier.refresh();
+        }
+        triggerSoldiers();
         setTimeout(run, Constant.UNIT_FRAME);
     }
 }
 
-let postMessageType = function(messageType: MessageType) {
+let triggerSoldiers = function() {
+    // Notify soldiers to run
     let param = new Map<String, any>();
-    param.set("soldierList", Context.getContext().soldierList);
-    param.set("dictSoldierNum", Context.getContext().dictSoldierNum);
-    param.set("youWin", Context.getContext().youWin);
-    param.set("gameRunning", Context.getContext().gameRunning);
-    let message = new Message(messageType, param);
+    param.set("context", Context.getContext());
+    let msgStart = new Message(MessageType.ASK_RUN, param);
+    workerPortPlayer.postMessage(msgStart);
+    workerPortRobot.postMessage(msgStart);
+}
+
+let resetPlayerCode = function(playerCode) {
+    let msg = new Message(MessageType.ASK_RESET, null, playerCode);
+    workerPortPlayer.postMessage(msg);
+}
+
+let postMessageType = function(messageType: MessageType) {
+    let param = null;
+    if (Context.getContext()) {
+        param = new Map<String, any>();
+        param.set("soldierList", Context.getContext().soldierList);
+        param.set("dictSoldierNum", Context.getContext().dictSoldierNum);
+        param.set("youWin", Context.getContext().youWin);
+        param.set("gameRunning", Context.getContext().gameRunning);
+    }
+    let message = new Message(messageType, param);    
+    postMessage.apply(null, [message]);
+}
+
+let logging = function(value: any) {
+    let message = new Message(MessageType.LOGGING, null, value);
     postMessage.apply(null, [message]);
 }
 

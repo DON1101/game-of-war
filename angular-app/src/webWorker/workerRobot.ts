@@ -27,7 +27,7 @@ let run = function() {
             	continue;
             }
             soldier = Robot.copy(soldier);
-            soldier.refresh();
+            // soldier.refresh();
             if (soldier.getAlive()) {
                 try {
                     soldier.nextAction();
@@ -47,20 +47,20 @@ let run = function() {
             let retMsg = new Message(MessageType.REPORT_SOLDIER_ACTION, param);
             judgePort.postMessage(retMsg);
         }
-        setTimeout(run, Constant.UNIT_FRAME);
+        // setTimeout(run, Constant.UNIT_FRAME);
     }
 }
 
-let syncContext = function() {
-	if (Context.getContext().gameRunning) {
-		let param = new Map<String, any>();
-		param.set("color", targetColor);
-		let retMsg = new Message(MessageType.REPORT_WAR_FIELD_CONTEXT, param);
-		judgePort.postMessage(retMsg);
+// let syncContext = function() {
+// 	if (Context.getContext().gameRunning) {
+// 		let param = new Map<String, any>();
+// 		param.set("color", targetColor);
+// 		let retMsg = new Message(MessageType.REPORT_WAR_FIELD_CONTEXT, param);
+// 		judgePort.postMessage(retMsg);
 
-		setTimeout(syncContext, Constant.UNIT_FRAME);
-	}
-}
+// 		setTimeout(syncContext, Constant.UNIT_FRAME);
+// 	}
+// }
 
 let messageFromJudge = function(event) {
 	let message = event.data;
@@ -70,11 +70,11 @@ let messageFromJudge = function(event) {
 			context = message.param.get("context");
 			Context.syncContext(context);
 			break;
-		case MessageType.REPORT_SOLDIER_START:
+		case MessageType.ASK_RUN:
 			context = message.param.get("context");
 			Context.syncContext(context);
 			run();
-			syncContext();
+			// syncContext();
 			break;
 		default:
 			break;

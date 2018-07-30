@@ -1,10 +1,10 @@
 export class Constant {
     public static UNIT_SIZE = 3; // px
     public static UNIT_FRAME = 100; // ms
-    public static MAP_WIDTH_UNIT = 20;
-    public static MAP_HEIGHT_UNIT = 20;
+    public static MAP_WIDTH_UNIT = 200;
+    public static MAP_HEIGHT_UNIT = 200;
     public static HEALTH_BAR_LENGTH_UNIT = 5;
-    public static SOLDIER_NUM_EACH = 5;
+    public static SOLDIER_NUM_EACH = 100;
     public static COLOR_NUM = 2;
     public static COLOR_LIST = ["red", "blue", "green", "black", "purple"];
     public static SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
@@ -13,7 +13,6 @@ export class Constant {
     public static HARM_INDEX = 10;
 
     public static PLAYER_CODE_DEFAULT = `
-importScripts("http://chancejs.com/chance.min.js");
 
 Player.prototype.playerFunc = function(self) {
     /* 每一轮行动中，士兵最多可以消耗1个行动数，士兵可以有如下行动指令：
@@ -36,10 +35,7 @@ Player.prototype.playerFunc = function(self) {
         侦查某个相对位置，如果该位置有士兵，则返回该士兵对象，否则返回null。
         该指令消耗0个行动数。
     */
-    let a = 0;
-    for(let i=0; i<99999; i++) a=i;
-    let chance = new Chance();
-    let i = chance.integer({min: 0, max: 4});
+    let i = Math.floor(Math.random() * 5);
     switch(i) {
         case 0:
             self.moveUp();

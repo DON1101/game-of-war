@@ -90,14 +90,19 @@ export class BattleFieldComponent {
 
     private render = (e) => {
         let message = e.data;
-        console.log(message);
-        this.soldierList = message.param.get("soldierList");
-        this.dictSoldierNum = message.param.get("dictSoldierNum");
-        this.youWin = message.param.get("youWin");
-        this.gameRunning = message.param.get("gameRunning");
-        this.requestAnimFrame(this.drawMap);
-        if (message.type == MessageType.ANSWER_GAME_OVER) {
-            this.stopTimer();
+        switch(message.type) {
+            case MessageType.LOGGING:
+                console.log(message.value);
+                break;
+            default:
+                this.soldierList = message.param.get("soldierList");
+                this.dictSoldierNum = message.param.get("dictSoldierNum");
+                this.youWin = message.param.get("youWin");
+                this.gameRunning = message.param.get("gameRunning");
+                this.requestAnimFrame(this.drawMap);
+                if (message.type == MessageType.ANSWER_GAME_OVER) {
+                    this.stopTimer();
+                }
         }
     }
 
@@ -195,6 +200,8 @@ export class BattleFieldComponent {
         this.initWebWorker();
         console.log('WebWorker initializing done!');
 
+        console.log('Reseting game...');
         this.resetGame();
+        console.log('Reseting game done!');
     }
 }
