@@ -7,12 +7,22 @@ import { Message, MessageType } from '../base/message';
 
 let workerPortRobot;
 let workerPortPlayer;
+let deadSet = new Set(); // Everybody only dies once
 
 onmessage = (e: MessageEvent) => {
     let message = e.data;
+    let param = null;
     switch (parseInt(message.type)) {
         case MessageType.ASK_START:
             Context.getContext().gameRunning = true;
+
+            // Notify soldiers to start
+            param = new Map<String, any>();
+            param.set("context", Context.getContext());
+            let msgStart = new Message(MessageType.REPORT_SOLDIER_START, param);
+            workerPortPlayer.postMessage(msgStart);
+            workerPortRobot.postMessage(msgStart);
+
             start();
             break;
         case MessageType.ASK_STOP:
@@ -31,15 +41,64 @@ onmessage = (e: MessageEvent) => {
             Context.getContext().gameTerminated = true;
             break;
         case MessageType.REPORT_CONNECT:
-            workerPortRobot = e.ports[0];
-            workerPortPlayer = e.ports[1];
-            break;
-        case MessageType.REPORT_SOLDIER_ACTION:
+            workerPortPlayer = e.ports[0];
+            workerPortRobot = e.ports[1];
+            workerPortPlayer.onmessage = onmessageFromSoldier;
+            workerPortRobot.onmessage = onmessageFromSoldier;
             break;
         default:
             break;
     }    
 };
+
+let onmessageFromSoldier = function(event) {
+    let message = event.data;
+    let param = null;
+    switch (parseInt(message.type)) {
+        case MessageType.REPORT_WAR_FIELD_CONTEXT:
+            param = new Map<String, any>();
+            param.set("context", Context.getContext());
+            let retMsg = new Message(MessageType.REPORT_WAR_FIELD_CONTEXT, param);
+            let color = message.param.get("color");
+            if (color == "red") {
+                workerPortPlayer.postMessage(retMsg);
+            } else {
+                workerPortRobot.postMessage(retMsg);
+            }
+            break;
+        case MessageType.REPORT_SOLDIER_ACTION:
+            let soldierId = message.param.get("id");
+            let action = message.param.get("action");
+            let soldier = Context.getContext().soldierList[soldierId];
+            if (!soldier.alive) {
+                break;
+            }
+            switch (action) {
+                case "up":
+                    soldier.moveUp();
+                    break;
+                case "down":
+                    soldier.moveDown();
+                    break;
+                case "left":
+                    soldier.moveLeft();
+                    break;
+                case "right":
+                    soldier.moveRight();
+                    break;
+                case "shoot":
+                    let x = parseInt(message.param.get("x"));
+                    let y = parseInt(message.param.get("y"));
+                    soldier.shoot(x, y);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+}
 
 let initMap = function() {
     Context.getContext().map = new Array(Constant.MAP_WIDTH_UNIT);
@@ -116,7 +175,6 @@ let updateDistMatrix = function() {
 }
 
 let updateHealth = function() {
-    let deadSet = new Set(); // Everybody only dies once
     for (let i = 0; i < Context.getContext().soldierList.length; i++) {
         let soldier1 = Context.getContext().soldierList[i];
         if (!soldier1.alive || soldier1.bullet == null) {
@@ -169,25 +227,25 @@ let checkWinner = function() {
 
 let run = function() {
     if (Context.getContext().gameRunning) {
-        for (let i in Context.getContext().soldierList) {
-            let soldier = Context.getContext().soldierList[i];
-            soldier.refresh();
-            if (soldier.alive) {
-                try {
-                    soldier.nextAction();
-                } catch(e) {
-                    console.log("Error: " + e);
-                    Context.getContext().gameRunning = false;
-                    return;
-                }
-            }
-        }
+        // for (let i in Context.getContext().soldierList) {
+        //     let soldier = Context.getContext().soldierList[i];
+        //     soldier.refresh();
+        //     if (soldier.alive) {
+        //         try {
+        //             soldier.nextAction();
+        //         } catch(e) {
+        //             console.log("Error: " + e);
+        //             Context.getContext().gameRunning = false;
+        //             return;
+        //         }
+        //     }
+        // }
         checkWinner();
         resetMap();
         updateDistMatrix();
         updateHealth();
         postMessageType(MessageType.ANSWER_RUNNING);
-        setTimeout(run, 1);
+        setTimeout(run, Constant.UNIT_FRAME);
     }
 }
 

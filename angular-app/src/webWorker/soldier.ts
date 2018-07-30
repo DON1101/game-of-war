@@ -14,6 +14,8 @@ export class Soldier {
     protected bullet = null;
     protected actionQuota = 1;
     protected shooter: Soldier = null;
+    protected lastAction = "";
+    protected lastActionParam = [];
 
     constructor(position:Position, color:string) {
         this.id = Context.getContext().nextSoldierId++;
@@ -26,10 +28,32 @@ export class Soldier {
         this.shooter = null;
         this.actionQuota = 1;
         this.alive = (this.hp > 0);
+        this.lastAction = "";
+        this.lastActionParam = [];
+    }
+
+    public getId() {
+        return this.id;
     }
 
     public getHp() {
         return this.hp;
+    }
+
+    public getColor() {
+        return this.color;
+    }
+
+    public getAlive() {
+        return this.alive;
+    }
+
+    public getLastAction() {
+        return this.lastAction;
+    }
+
+    public getLastActionParam() {
+        return this.lastActionParam;
     }
 
     // Probe a position relative to self, e.g (1, 1), (-1, -1)
@@ -79,7 +103,7 @@ export class Soldier {
     }
 
     private shotBy(shooter:Soldier, distance:number) {
-        let harm = Math.max(1 - distance/Constant.SHOOT_RANGE_UNIT, 0);
+        let harm = Math.max(1 - distance/Constant.SHOOT_RANGE_UNIT, 0) * Constant.HARM_INDEX;
         this.hp -= harm;
         this.shooter = shooter;
     }
@@ -93,6 +117,7 @@ export class Soldier {
             this.pos.y = y;
         }
         this.actionQuota--;
+        this.lastAction = "up";
     };
 
     public moveDown() {
@@ -104,6 +129,7 @@ export class Soldier {
             this.pos.y = y;
         }
         this.actionQuota--;
+        this.lastAction = "down";
     };
 
     public moveLeft() {
@@ -115,6 +141,7 @@ export class Soldier {
             this.pos.x = x;
         }
         this.actionQuota--;
+        this.lastAction = "left";
     };
 
     public moveRight() {
@@ -126,6 +153,7 @@ export class Soldier {
             this.pos.x = x;
         }
         this.actionQuota--;
+        this.lastAction = "right";
     };
 
     public shoot(x:number, y:number) {
@@ -134,6 +162,8 @@ export class Soldier {
         }
         this.bullet = new Position(x, y);
         this.actionQuota--;
+        this.lastAction = "shoot";
+        this.lastActionParam = [x, y];
     };
 
     public nextAction() {

@@ -7,6 +7,8 @@ export enum MessageType {
     ANSWER_GAME_OVER = 101,
     REPORT_CONNECT = 201,
     REPORT_SOLDIER_ACTION = 202,
+    REPORT_WAR_FIELD_CONTEXT = 203,
+    REPORT_SOLDIER_START = 204,
 }
 
 export class Message {
