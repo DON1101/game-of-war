@@ -1,16 +1,25 @@
 <div id="instruction-code">
     <div class="panel panel-default">
       <div class="panel-heading">
-        编写你的策略
+        Write your own strategy
       </div>
       <div class="panel-body">
-        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">确定</button>
-        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">取消</button>
+        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">Apply</button>
+        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">Cancel</button>
+
+        <div class="alert alert-info" role="alert">
+          You can use below constants in your scripts:<br/><br/>
+
+          Constant.MAP_WIDTH_UNIT = {{MAP_WIDTH_UNIT}}; // Total width of the map<br/>
+          Constant.MAP_HEIGHT_UNIT = {{MAP_HEIGHT_UNIT}}; // Total height of the map<br/>
+          Constant.SIGHT_RANGE_UNIT = {{SIGHT_RANGE_UNIT}}; // How far can a soldier see and probe<br/>
+          Constant.SHOOT_RANGE_UNIT = {{SHOOT_RANGE_UNIT}}; // How far can a solder shoot<br/>
+        </div>
 
         <textarea id="code-area" class="width-max" rows="50" cols="2" [(ngModel)]="playerCode"></textarea>
 
-        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">确定</button>
-        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">取消</button>
+        <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="applyCode()">Apply</button>
+        <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="cancel()">Cancel</button>
       </div>
     </div>
 </div>

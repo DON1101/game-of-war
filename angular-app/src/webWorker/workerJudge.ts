@@ -46,17 +46,6 @@ let onmessageFromSoldier = function(event) {
     let message = event.data;
     let param = null;
     switch (parseInt(message.type)) {
-        // case MessageType.REPORT_WAR_FIELD_CONTEXT:
-        //     param = new Map<String, any>();
-        //     param.set("context", Context.getContext());
-        //     let retMsg = new Message(MessageType.REPORT_WAR_FIELD_CONTEXT, param);
-        //     let color = message.param.get("color");
-        //     if (color == "red") {
-        //         workerPortPlayer.postMessage(retMsg);
-        //     } else {
-        //         workerPortRobot.postMessage(retMsg);
-        //     }
-        //     break;
         case MessageType.LOGGING:
             logging(message.value);
             break;

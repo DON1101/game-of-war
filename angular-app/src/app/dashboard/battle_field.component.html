@@ -1,25 +1,25 @@
 <div class="panel panel-default">
   <div class="panel-body">
     <div *ngIf="gameRunning" class="alert alert-info font-bold" role="alert">
-        战斗中...
+        Fighting...
     </div>
     <div *ngIf="!gameRunning">
         <div *ngIf="youWin==null" class="alert alert-info font-bold" role="alert">
-            准备战斗
+            Ready to fight
         </div>
         <div *ngIf="youWin==true" class="alert alert-success font-bold" role="alert">
-            你赢了！
+            You win！
         </div>
         <div *ngIf="youWin==false" class="alert alert-danger font-bold" role="alert">
-            你输了！
+            You lose！
         </div>
     </div>
 
     <table>
         <tr *ngFor="let n of [] | range:COLOR_NUM; let first = first;">
             <td class="font-bold" [style.color]="COLOR_LIST[n]">
-                <font *ngIf="first">你方</font>
-                <font *ngIf="!first">电脑{{n}}</font>
+                <font *ngIf="first">You</font>
+                <font *ngIf="!first">Robot{{n}}</font>
             </td>
             <td>
                 <div class="health-bar" data-total="1000" data-value="1000">
@@ -27,29 +27,29 @@
                 </div>
             </td>
             <td>
-                <font>{{dictSoldierNum[COLOR_LIST[n]]}} 人存活</font>
+                <font>{{dictSoldierNum[COLOR_LIST[n]]}} soldiers alive</font>
             </td>
         </tr>
     </table>
 
     <div id="timer">
-        <font *ngIf="GAME_TOTAL_TIME>0">限时{{GAME_TOTAL_TIME}}秒：</font>
-        <font *ngIf="GAME_TOTAL_TIME<=0">计时：</font>
+        <font *ngIf="GAME_TOTAL_TIME>0">Time limit {{GAME_TOTAL_TIME}} seconds：</font>
+        <font *ngIf="GAME_TOTAL_TIME<=0">Time elapsed：</font>
         {{timeElapsed|toHHMMSS}}
     </div>
 
     <div>
         <button type="button" class="btn btn-primary" aria-haspopup="true" aria-expanded="false" (click)="startGame()">
-            开始
+            Start
         </button>
         <button type="button" class="btn btn-danger" aria-haspopup="true" aria-expanded="false" (click)="stopGame()">
-            暂停
+            Pause
         </button>
         <button type="button" class="btn btn-warning" aria-haspopup="true" aria-expanded="false" (click)="resetGame()">
-            重置
+            Reset
         </button>
         <button type="button" class="btn btn-default" aria-haspopup="true" aria-expanded="false" (click)="prepare()">
-            重新备战
+            Re-Prepare
         </button>
     </div>
 

@@ -4,7 +4,7 @@ export class Constant {
     public static MAP_WIDTH_UNIT = 200;
     public static MAP_HEIGHT_UNIT = 200;
     public static HEALTH_BAR_LENGTH_UNIT = 5;
-    public static SOLDIER_NUM_EACH = 100;
+    public static SOLDIER_NUM_EACH = 200;
     public static COLOR_NUM = 2;
     public static COLOR_LIST = ["red", "blue", "green", "black", "purple"];
     public static SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight
@@ -15,25 +15,30 @@ export class Constant {
     public static PLAYER_CODE_DEFAULT = `
 
 Player.prototype.playerFunc = function(self) {
-    /* 每一轮行动中，士兵最多可以消耗1个行动数，士兵可以有如下行动指令：
+    /* 
+    Each soldier is looping for actions.
+    During each loop, a soldier can have ONLY ONE action.
+    Available actions including:
     self.moveUp()
-        向上移动一个单位。
-        该指令消耗1个行动数。
+        Move 1 unit distance up.
+        Consuming 1 action count.
     self.moveDown()
-        向下移动一个单位。
-        该指令消耗1个行动数。
+        Move 1 unit distance down.
+        Consuming 1 action count.
     self.moveLeft()
-        向左移动一个单位。
-        该指令消耗1个行动数。
+        Move 1 unit distance to left.
+        Consuming 1 action count.
     self.moveRight()
-        向右移动一个单位。
-        该指令消耗1个行动数。
+        Move 1 unit distance to right.
+        Consuming 1 action count.
     self.shoot(relativeX, relativeY)
-        向某个相对方向开枪射击。
-        该指令消耗1个行动数。
+        Shoot to the relative direction.
+        Consuming 1 action count.
     self.probePosition(relativeX, relativeY)
-        侦查某个相对位置，如果该位置有士兵，则返回该士兵对象，否则返回null。
-        该指令消耗0个行动数。
+        Probe a relative position, 
+        if there's a soldier standing on that position, return that soldier,
+        else, return null.
+        Consuming 0 action count.
     */
     let i = Math.floor(Math.random() * 5);
     switch(i) {
