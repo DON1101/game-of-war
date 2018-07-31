@@ -2,8 +2,8 @@ import { Message, MessageType } from '../base/message';
 import { Context } from './context';
 import { Player } from './player';
 
-var judgePort;
-var targetColor = "red";
+let judgePort;
+let targetColor = "red";
 
 onmessage = function(event) {
 	let message = event.data;
