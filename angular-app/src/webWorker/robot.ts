@@ -6,6 +6,21 @@ export class Robot extends Soldier {
         super(position, color);
     }
 
+    public static copy(soldier: Robot) {
+        let newSoldier = new Robot(null, null);
+        newSoldier.id = soldier.id;
+        newSoldier.pos = soldier.pos;
+        newSoldier.color = soldier.color;
+        newSoldier.hp = soldier.hp;
+        newSoldier.alive = soldier.alive;
+        newSoldier.bullet = soldier.bullet;
+        newSoldier.actionQuota = soldier.actionQuota;
+        newSoldier.shooter = soldier.shooter;
+        newSoldier.lastAction = soldier.lastAction;
+        newSoldier.lastActionParam = soldier.lastActionParam;
+        return newSoldier;
+    }
+
     private randomAction() {
         let i = Math.floor(Math.random() * 4);
         switch(i) {

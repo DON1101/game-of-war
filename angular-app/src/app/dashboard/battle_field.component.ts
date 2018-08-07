@@ -90,13 +90,19 @@ export class BattleFieldComponent {
 
     private render = (e) => {
         let message = e.data;
-        this.soldierList = message.param.get("soldierList");
-        this.dictSoldierNum = message.param.get("dictSoldierNum");
-        this.youWin = message.param.get("youWin");
-        this.gameRunning = message.param.get("gameRunning");
-        this.requestAnimFrame(this.drawMap);
-        if (message.type == MessageType.ANSWER_GAME_OVER) {
-            this.stopTimer();
+        switch(message.type) {
+            case MessageType.LOGGING:
+                console.log(message.value);
+                break;
+            default:
+                this.soldierList = message.param.get("soldierList");
+                this.dictSoldierNum = message.param.get("dictSoldierNum");
+                this.youWin = message.param.get("youWin");
+                this.gameRunning = message.param.get("gameRunning");
+                this.requestAnimFrame(this.drawMap);
+                if (message.type == MessageType.ANSWER_GAME_OVER) {
+                    this.stopTimer();
+                }
         }
     }
 
@@ -113,8 +119,8 @@ export class BattleFieldComponent {
         this.workerPlayer.postMessage(msgConnect, [channelPlayer.port1]);
 
         this.workerJudge.postMessage(msgConnect, [
-            channelRobot.port2,
             channelPlayer.port2,
+            channelRobot.port2,
         ]);
 
         this.workerJudge.addEventListener('message', this.render);
@@ -186,8 +192,16 @@ export class BattleFieldComponent {
         this.canvas.height = Constant.UNIT_SIZE * Constant.MAP_HEIGHT_UNIT;
         this.canvas.width = Constant.UNIT_SIZE * Constant.MAP_WIDTH_UNIT;
 
+        console.log('Render initializing...');
         this.initRender();
+        console.log('Render initializing done!');
+
+        console.log('WebWorker initializing...');
         this.initWebWorker();
+        console.log('WebWorker initializing done!');
+
+        console.log('Reseting game...');
         this.resetGame();
+        console.log('Reseting game done!');
     }
 }
