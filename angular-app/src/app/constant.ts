@@ -1,10 +1,10 @@
 export class Constant {
     public static UNIT_SIZE = 3; // px
-    public static UNIT_FRAME = 100; // ms
+    public static UNIT_FRAME = 10; // ms
     public static MAP_WIDTH_UNIT = 200;
     public static MAP_HEIGHT_UNIT = 200;
     public static HEALTH_BAR_LENGTH_UNIT = 5;
-    public static SOLDIER_NUM_EACH = 200;
+    public static SOLDIER_NUM_EACH = 300;
     public static COLOR_NUM = 2;
     public static COLOR_LIST = ["red", "blue", "green", "black", "purple"];
     public static SIGHT_RANGE_UNIT = 50; // how far can a soldier can see in sight

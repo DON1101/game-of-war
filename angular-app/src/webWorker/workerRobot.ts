@@ -3,8 +3,8 @@ import { Context } from './context';
 import { Constant } from '../app/constant';
 import { Robot } from './robot';
 
-var judgePort;
-var targetColor = "blue";
+let judgePort;
+let targetColor = "blue";
 
 onmessage = function(event) {
 	let message = event.data;
