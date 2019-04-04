@@ -21,27 +21,22 @@ let messageFromJudge = function(event) {
 	let message = event.data;
 	let context = null;
 	switch (parseInt(message.type)) {
-		case MessageType.REPORT_WAR_FIELD_CONTEXT:
-			context = message.param.get("context");
-			Context.syncContext(context);
-			break;
-		case MessageType.ASK_RESET:
-			let playerCode = message.value;
-			Player.resetPlayer(playerCode);
-			break;
+		// case MessageType.REPORT_WAR_FIELD_CONTEXT:
+		// 	context = message.param.get("context");
+		// 	Context.syncContext(context);
+		// 	break;
 		case MessageType.ASK_RUN:
 			context = message.param.get("context");
 			Context.syncContext(context);
 			run();
 			break;
+        case MessageType.ASK_RESET:
+            let playerCode = message.value;
+            Player.resetPlayer(playerCode);
+            break;
 		default:
 			break;
 	}
-}
-
-let logging = function(value: any) {
-    let message = new Message(MessageType.LOGGING, null, value);
-    judgePort.postMessage(message);
 }
 
 let run = function() {
@@ -72,4 +67,9 @@ let run = function() {
             judgePort.postMessage(retMsg);
         }
     }
+}
+
+let logging = function(value: any) {
+    let message = new Message(MessageType.LOGGING, null, value);
+    judgePort.postMessage(message);
 }
